@@ -1,0 +1,27 @@
+[project]
+name = "poetry-analysis"
+version = "0.1.2"
+description = "Tool to parse, annotate and analyse Norwegian poetry."
+authors = [
+    {name = "Ingerid Dale", email = "ingerid.dale@nb.no"},
+]
+dependencies = ["nb-tokenizer>=0.1.0", "pandas>=2.2.3", "convert-pa>=0.1.0"]
+requires-python = ">=3.11"
+readme = "README.md"
+license = {text = "CC-BY"}
+
+[build-system]
+requires = ["pdm-backend"]
+build-backend = "pdm.backend"
+
+
+[tool.pdm]
+distribution = true
+
+[dependency-groups]
+dev = [
+    "pytest>=8.3.4",
+    "pytest-cov>=6.0.0",
+    "ruff>=0.9.4",
+    "ipykernel>=6.29.5",
+]
