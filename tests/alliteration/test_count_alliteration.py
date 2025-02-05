@@ -1,4 +1,4 @@
-from poetry_analysis import alliteration
+from poetry_analysis.alliteration import count_alliteration
 
 
 def test_alliteration_returns_initial_consonant_counts():
@@ -16,7 +16,7 @@ Slægternes Strid.
 """
     expected = {"s": 20}
     # When
-    result = alliteration.count_alliteration(text)
+    result = count_alliteration(text)
     # Then
     assert result == expected
 
@@ -25,6 +25,6 @@ def test_count_alliteration_counts_only_words_with_alliteration():
     # Given
     text = "Her er noen ord som ikke gir alliterasjon"
     # When
-    result = alliteration.count_alliteration(text)
+    result = count_alliteration(text)
     # Then
     assert result == {}

@@ -1,5 +1,5 @@
 import pytest
-from poetry_analysis import rhyme_detection as rt
+from poetry_analysis.utils import split_stanzas
 
 
 @pytest.mark.parametrize(
@@ -14,7 +14,7 @@ def test_multi_stanza_poem_is_split_into_correct_number_of_stanzas(example_fixtu
     # given example poems
     example = request.getfixturevalue(example_fixture)
     # when
-    result = rt.split_stanzas(example)
+    result = split_stanzas(example)
     # then
     assert len(result) == n_stanzas  # Number of stanzas in the poem
     assert all(

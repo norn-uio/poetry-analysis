@@ -146,15 +146,6 @@ def score_rhyme(syllable1: list, syllable2: list) -> int:
     return rhyme_score
 
 
-def split_stanzas(text: str) -> list:
-    """Split a poem into stanzas and stanzas into verses."""
-    return [
-        [verse.rstrip() for verse in stanza.rstrip().splitlines()]
-        for stanza in re.split("\n{2,}", text)
-        if stanza
-    ]
-
-
 def tag_rhyming_verses(transcribed_verses: list) -> list:
     """Annotate end rhyme patterns in a poem stanza.
 
@@ -286,6 +277,9 @@ def main(poem_file: str):
 # %%
 
 if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
+
     import argparse
     from datetime import datetime
 
@@ -303,5 +297,3 @@ if __name__ == "__main__":
         logging_file = f"{__file__.split('.')[0]}_{today}.log"
         logging.basicConfig(level=logging.DEBUG, filename=logging_file, filemode="a")
     main(args.jsonfile)
-
-# %%

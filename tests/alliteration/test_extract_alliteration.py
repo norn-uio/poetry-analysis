@@ -1,4 +1,4 @@
-from poetry_analysis import alliteration
+from poetry_analysis.alliteration import extract_alliteration
 
 
 def test_alliteration_returns_initial_consonant_words():
@@ -40,6 +40,6 @@ Slægternes Strid.
         }
     }
     # When
-    result = alliteration.extract_alliteration(text)
+    result = extract_alliteration(text)
     # Then
     assert result == expected

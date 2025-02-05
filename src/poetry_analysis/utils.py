@@ -1,7 +1,8 @@
 import re
+import json
 import string
 from typing import Generator
-
+from pathlib import Path
 
 from convert_pa import nofabet_to_ipa, convert_nofabet
 
@@ -73,3 +74,46 @@ def split_paragraphs(text: str) -> list:
 
 def format_transcription(pronunciation):
     return " ".join(pronunciation)
+
+
+def gather_stanza_annotations(func) -> callable:
+    """Decorator to apply a function to each stanza in a text."""
+
+    def wrapper(text: str) -> dict:
+        stanzas = split_stanzas(text)
+        stanza_annotations = {}
+        for i, stanza in enumerate(stanzas, 1):
+            stanza_text = "\n".join(stanza)
+            stanza_annotations[f"stanza_{i}"] = func(stanza_text)
+        return stanza_annotations
+
+    return wrapper
+
+
+def split_stanzas(text: str) -> list:
+    """Split a poem into stanzas and stanzas into verses."""
+    return [
+        [verse.rstrip() for verse in stanza.rstrip().splitlines()]
+        for stanza in re.split("\n{2,}", text)
+        if stanza
+    ]
+
+
+def annotate(func, text: str, stanzaic: bool = False, outputfile: str | Path = None):
+    if stanzaic:
+        new_func = gather_stanza_annotations(func)
+        annotations = new_func(text)
+    else:
+        annotations = func(text)
+    if outputfile is not None:
+        Path(outputfile).write_text(
+            json.dumps(annotations, indent=4, ensure_ascii=False), encoding="utf-8"
+        )
+        print(f"Saved annotated data to {outputfile}")
+    else:
+        return annotations
+
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
