@@ -25,3 +25,7 @@ dev = [
     "ruff>=0.9.4",
     "ipykernel>=6.29.5",
 ]
+
+
+[tool.pytest.ini_options]
+addopts = "--doctest-modules --cov=src"
