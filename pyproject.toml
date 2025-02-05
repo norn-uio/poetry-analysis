@@ -8,7 +8,7 @@ authors = [
 dependencies = ["nb-tokenizer>=0.1.0", "pandas>=2.2.3", "convert-pa>=0.1.0"]
 requires-python = ">=3.11"
 readme = "README.md"
-license = {text = "CC-BY"}
+license = {text = "CC BY 4.0"}
 
 [build-system]
 requires = ["pdm-backend"]
