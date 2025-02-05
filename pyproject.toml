@@ -1,6 +1,6 @@
 [project]
 name = "poetry-analysis"
-version = "0.1.2"
+version = "0.2.0"
 description = "Tool to parse, annotate and analyse Norwegian poetry."
 authors = [
     {name = "Ingerid Dale", email = "ingerid.dale@nb.no"},
@@ -9,6 +9,10 @@ dependencies = ["nb-tokenizer>=0.1.0", "pandas>=2.2.3", "convert-pa>=0.1.0"]
 requires-python = ">=3.11"
 readme = "README.md"
 license = {text = "CC BY 4.0"}
+urls = {
+    "Source": "https://github.com/norn-uio/poetry-analysis"
+    "Issues": "https://github.com/norn-uio/poetry-analysis/issues"
+}
 
 [build-system]
 requires = ["pdm-backend"]
