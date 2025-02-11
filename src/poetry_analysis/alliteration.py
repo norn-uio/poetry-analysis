@@ -32,7 +32,6 @@ def count_alliteration(text: str) -> dict:
     return alliteration_count
 
 
-#@gather_stanza_annotations
 def extract_alliteration(text: list[str]) -> list[dict]:
     """Extract words that start with the same letter from a text.
 
@@ -61,14 +60,17 @@ def extract_alliteration(text: list[str]) -> list[dict]:
                 seen[initial_letter] = [word]
 
             if (j == len(words) - 1) and any(len(v) > 1 for v in seen.values()):
-                alliterations.append(
-                    {
-                        "line": i,
-                        "symbol": initial_letter,
-                        "count": len(seen[initial_letter]),
-                        "words": seen[initial_letter],
-                    }
-                )
+                alliteration_symbols = [k for k, v in seen.items() if len(v) > 1]
+                for symbol in alliteration_symbols:
+                    alliterations.append(
+                        {
+                            "line": i,
+                            "symbol": symbol,
+                            "count": len(seen[symbol]),
+                            "words": seen[symbol],
+                        }
+                    )
+                
 
     return alliterations
 
