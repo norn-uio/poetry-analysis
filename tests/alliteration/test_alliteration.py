@@ -2,7 +2,7 @@ import pytest
 from poetry_analysis.alliteration import extract_alliteration
 
 
-def test_alliteration_returns_2_initial_consonant_counts():
+def test_alliteration_returns_initial_consonant_counts():
     # Given
     text = [line.strip() for line in """Stjerneklare Septembernat
     Skaldene som siger sandhetden smukkest
