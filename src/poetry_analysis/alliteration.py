@@ -32,37 +32,45 @@ def count_alliteration(text: str) -> dict:
     return alliteration_count
 
 
-@gather_stanza_annotations
-def extract_alliteration(text: str) -> dict:
+#@gather_stanza_annotations
+def extract_alliteration(text: list[str]) -> list[dict]:
     """Extract words that start with the same letter from a text.
 
-    NB! This function is case-insensitive and returns alphabetically sorted lists of unique words.
+    NB! This function is case-insensitive and compares e.g. S to s as the same letter.
 
+    Args:
+        text (list): A list of strings, where each string is a line of text.
+    
     Example use:
-    >>> text = "Stjerneklare Septembernat Sees Sirius, Sydhimlens smukkeste Stjerne"
+    >>> text = ['Stjerneklare Septembernat Sees Sirius', 'Sydhimlens smukkeste Stjerne']
     >>> extract_alliteration(text)
-    {'s': ['Sees', 'Septembernat', 'Sirius,', 'Stjerne', 'Stjerneklare', 'Sydhimlens', 'smukkeste']}
+    [{'line': 0, 'symbol': 's', 'count': 4, 'words': ['Stjerneklare', 'Septembernat', 'Sees', 'Sirius']}, {'line': 1, 'symbol': 's', 'count': 3, 'words': ['Sydhimlens', 'smukkeste', 'Stjerne']}]
     """
-    words = text.split()
-    alliterations = {}
 
-    for i, current_word in enumerate(words):
-        for k in range(i + 1, len(words)):
-            next_word = words[k]
+    alliterations = []
 
-            initial_letter = current_word[0].lower()
-            next_initial_letter = next_word[0].lower()
+    for i, line in enumerate(text):   
+        words = line.split() if isinstance(line, str) else line
+        seen = {}
+        for j, word in enumerate(words):
+            initial_letter = word[0].lower()
 
-            if initial_letter.lower() == next_initial_letter.lower():
-                if initial_letter in alliterations:
-                    alliterations[initial_letter].add(next_word)
-                else:
-                    alliterations[initial_letter] = {current_word, next_word}
-    sorted_alliterations = {
-        k: sorted(list(v)) for k, v in alliterations.items() if len(v) > 1
-    }
+            if initial_letter in seen:
+                seen[initial_letter].append(word)
+            else:
+                seen[initial_letter] = [word]
 
-    return sorted_alliterations
+            if (j == len(words) - 1) and any(len(v) > 1 for v in seen.values()):
+                alliterations.append(
+                    {
+                        "line": i,
+                        "symbol": initial_letter,
+                        "count": len(seen[initial_letter]),
+                        "words": seen[initial_letter],
+                    }
+                )
+
+    return alliterations
 
 
 if __name__ == "__main__":
