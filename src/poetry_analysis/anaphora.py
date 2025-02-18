@@ -1,5 +1,8 @@
-"""Anaphora is the repetition of the same word or phrase
-at the beginning of successive clauses or sentences.
+"""Anaphora is the repetition of the same line-initial word or phrase
+in a verse, or across consecutive verses in a stanza. 
+
+It can also refer to the repetition of a whole stanza-initial verse line 
+in consecutive stanzas.
 """
 from collections import defaultdict, Counter
 from pathlib import Path
@@ -17,7 +20,7 @@ def count_initial_phrases(text: str) -> Counter:
         if len(words) >= n:
             phrase = " ".join(words[:n])
             count = text.count(phrase)
-            if count > 1:
+            if count > 0:
                 phrase_counts[phrase] += count
     return phrase_counts
 
@@ -39,6 +42,36 @@ def extract_line_anaphora(text: str) -> list:
             anaphora.append(annotation)
     return anaphora
 
+
+def extract_stanza_anaphora(text: str) -> list:
+    """Extract line-initial word sequences that are repeated at least twice in each stanza."""
+    anaphora = []
+    
+    stanzas = split_stanzas(text)
+    for i, stanza in enumerate(stanzas):
+        stanza_anaphora = find_anaphora_in_stanza(stanza)
+    
+        for phrase, count in stanza_anaphora.items():
+            line_ids = [l for l, line in enumerate(stanza) if line.startswith(phrase)]
+            anaphora.append({
+                "stanza_id": i, 
+                "line_id": line_ids,
+                "phrase": phrase,
+                "count": count
+            })
+
+    return anaphora
+
+
+def find_anaphora_in_stanza(lines: list) -> list:
+    """Extract line-initial word sequences that are repeated at least twice in the same stanza."""
+    phrase_counts = Counter()
+
+    for line in lines:
+        line_initial_phrases = count_initial_phrases(line)
+        phrase_counts.update(line_initial_phrases)
+
+    return phrase_counts
 
 
 def extract_anaphora(text: str) -> dict:
