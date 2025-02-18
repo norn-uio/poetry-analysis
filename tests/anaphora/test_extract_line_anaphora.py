@@ -1,19 +1,20 @@
+import pytest
 from poetry_analysis.anaphora import extract_line_anaphora
 
 
 def test_extract_line_anaphora_extracts_longest_repeating_sequence():
     text = "hello hello world\nhello world hello world hello world"
     expected = [{
-        "line":0,
+        "line_id":0,
         "phrase": "hello",
         "count": 2,
     }, {
-        "line":1,
+        "line_id":1,
         "phrase": "hello world",
         "count": 3,
     }]
     result = extract_line_anaphora(text)
-    assert result == expected
+    assert result == pytest.approx(expected)
 
 
 def test_line_final_word_sequences_return_empty_list():
