@@ -6,6 +6,26 @@ from pathlib import Path
 
 from poetry_analysis.utils import strip_punctuation, annotate
 
+def extract_line_anaphora(text: str) -> dict:
+    """Extract word sequences that are repeated at least twice on the same line."""
+    anaphora = [] 
+    lines = text.strip().lower().split("\n")
+    for i, line in enumerate(lines):
+        words = strip_punctuation(line).split()
+        n_words = len(words)
+        longest_phrase = ""
+        for n in range(1, n_words + 1):
+            if len(words) >= n:
+                phrase = " ".join(words[:n])
+                count = line.count(phrase)
+                if count > 1 and len(phrase) > len(longest_phrase):
+                    longest_phrase = phrase
+                    phrase_count = {"line": i, "phrase": longest_phrase, "count": count}
+        if longest_phrase:
+            anaphora.append(phrase_count)
+    return anaphora
+
+
 
 def extract_anaphora(text: str) -> dict:
     """Extract line-initial word sequences that are repeated at least twice.
