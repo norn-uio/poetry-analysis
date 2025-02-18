@@ -1,28 +1,42 @@
 """Anaphora is the repetition of the same word or phrase
 at the beginning of successive clauses or sentences.
 """
-from collections import defaultdict
+from collections import defaultdict, Counter
 from pathlib import Path
 
-from poetry_analysis.utils import strip_punctuation, annotate
+from poetry_analysis.utils import strip_punctuation, annotate, split_stanzas
 
-def extract_line_anaphora(text: str) -> dict:
+
+def count_initial_phrases(text: str) -> Counter:
+    """Count the number of times initial phrases of different lengths occur in a string."""
+    phrase_counts = Counter()
+    words = strip_punctuation(text).split()
+    n_words = len(words)
+   
+    for n in range(1, n_words + 1):
+        if len(words) >= n:
+            phrase = " ".join(words[:n])
+            count = text.count(phrase)
+            if count > 1:
+                phrase_counts[phrase] += count
+    return phrase_counts
+
+
+def extract_line_anaphora(text: str) -> list:
     """Extract word sequences that are repeated at least twice on the same line."""
     anaphora = [] 
     lines = text.strip().lower().split("\n")
     for i, line in enumerate(lines):
-        words = strip_punctuation(line).split()
-        n_words = len(words)
-        longest_phrase = ""
-        for n in range(1, n_words + 1):
-            if len(words) >= n:
-                phrase = " ".join(words[:n])
-                count = line.count(phrase)
-                if count > 1 and len(phrase) > len(longest_phrase):
-                    longest_phrase = phrase
-                    phrase_count = {"line": i, "phrase": longest_phrase, "count": count}
-        if longest_phrase:
-            anaphora.append(phrase_count)
+        
+        line_initial_phrases = count_initial_phrases(line)
+        if line_initial_phrases: 
+            longest_phrase = max(line_initial_phrases, key=len)
+            count = line_initial_phrases[longest_phrase]
+            # TODO: refactor so when assertion fails, the most common phrase is saved rather than the longest
+            assert count == line_initial_phrases.most_common(1)[0][1]
+
+            annotation = {"line_id": i, "phrase": longest_phrase, "count": count}
+            anaphora.append(annotation)
     return anaphora
 
 
