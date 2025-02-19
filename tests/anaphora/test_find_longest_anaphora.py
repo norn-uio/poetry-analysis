@@ -1,5 +1,5 @@
 import pytest
-from poetry_analysis.anaphora import find_longest_anaphora_in_line
+from poetry_analysis.anaphora import find_longest_anaphora
 from collections import Counter
 
 
@@ -10,7 +10,7 @@ def test_find_most_repeating_sequence():
     expected_count = 3
 
     # When
-    actual_phrase, actual_count = find_longest_anaphora_in_line(phrases)
+    actual_phrase, actual_count = find_longest_anaphora(phrases)
 
     # Then
     assert actual_phrase == expected_phrase
@@ -24,7 +24,7 @@ def test_find_longest_repeating_sequence():
     expected_count = 2
 
     # When
-    actual_phrase, actual_count = find_longest_anaphora_in_line(phrases)
+    actual_phrase, actual_count = find_longest_anaphora(phrases)
 
     # Then
     assert actual_phrase == expected_phrase
@@ -38,7 +38,7 @@ def test_find_longest_most_repeating_sequence():
     expected_count = 3
 
     # When
-    actual_phrase, actual_count = find_longest_anaphora_in_line(phrases)
+    actual_phrase, actual_count = find_longest_anaphora(phrases)
 
     # Then
     assert actual_phrase == expected_phrase
@@ -52,7 +52,7 @@ def test_ignores_longer_sequence_with_lower_count():
     expected_count = 3
 
     # When
-    actual_phrase, actual_count = find_longest_anaphora_in_line(phrases)
+    actual_phrase, actual_count = find_longest_anaphora(phrases)
 
     # Then
     assert actual_phrase == expected_phrase
@@ -64,7 +64,8 @@ def test_find_longest_repeating_sequence_returns_None_with_empty_counter():
     phrases = Counter()
 
     # When
-    actual_phrase, actual_count = find_longest_anaphora_in_line(phrases)
+    actual_phrase, actual_count = find_longest_anaphora(phrases)
     # Then
     assert actual_phrase is None
     assert actual_count == 0
+
