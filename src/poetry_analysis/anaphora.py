@@ -25,6 +25,25 @@ def count_initial_phrases(text: str) -> Counter:
     return phrase_counts
 
 
+def find_longest_anaphora_in_line(phrases: Counter) -> dict:
+    """Find the longest and most repeated word sequence in a line."""
+    if not phrases:
+        return None, 0
+
+    most_common_phrase, highest_count = phrases.most_common()[0]
+
+    print(most_common_phrase, highest_count)
+    longest_phrase = max(phrases.keys(), key=len)
+    longest_count = phrases[longest_phrase]
+    print(longest_phrase, longest_count)
+
+    if highest_count == longest_count:
+        annotation = (longest_phrase, longest_count)
+    else:
+        annotation = (most_common_phrase, highest_count)
+    return annotation
+
+
 def extract_line_anaphora(text: str) -> list:
     """Extract word sequences that are repeated at least twice on the same line."""
     anaphora = [] 
