@@ -48,15 +48,10 @@ def extract_line_anaphora(text: str) -> list:
     anaphora = [] 
     lines = text.strip().lower().split("\n")
     for i, line in enumerate(lines):
-        
         line_initial_phrases = count_initial_phrases(line)
-        if line_initial_phrases: 
-            longest_phrase = max(line_initial_phrases, key=len)
-            count = line_initial_phrases[longest_phrase]
-            # TODO: refactor so when assertion fails, the most common phrase is saved rather than the longest
-            assert count == line_initial_phrases.most_common(1)[0][1]
-
-            annotation = {"line_id": i, "phrase": longest_phrase, "count": count}
+        phrase, count = find_longest_anaphora_in_line(line_initial_phrases)
+        if count > 1:
+            annotation = {"line_id": i, "phrase": phrase, "count": count}
             anaphora.append(annotation)
     return anaphora
 
