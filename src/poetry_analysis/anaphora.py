@@ -31,11 +31,10 @@ def find_longest_anaphora_in_line(phrases: Counter) -> dict:
         return None, 0
 
     most_common_phrase, highest_count = phrases.most_common()[0]
+    top_phrases = [phrase for phrase, _ in phrases.most_common() if phrases[phrase] == highest_count]
 
-    print(most_common_phrase, highest_count)
-    longest_phrase = max(phrases.keys(), key=len)
+    longest_phrase = max(top_phrases, key=len)
     longest_count = phrases[longest_phrase]
-    print(longest_phrase, longest_count)
 
     if highest_count == longest_count:
         annotation = (longest_phrase, longest_count)
