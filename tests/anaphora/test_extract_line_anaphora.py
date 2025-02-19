@@ -2,19 +2,23 @@ import pytest
 from poetry_analysis.anaphora import extract_line_anaphora
 
 
-def test_extract_line_anaphora_extracts_longest_repeating_sequence():
-    text = "hello hello world\nhello world hello world hello world"
-    expected = [{
-        "line_id":0,
-        "phrase": "hello",
-        "count": 2,
-    }, {
-        "line_id":1,
-        "phrase": "hello world",
-        "count": 3,
-    }]
+@pytest.mark.parametrize(
+        "text, expected_phrase, expected_count",
+        [
+            ("hello hello world", "hello", 2),
+            ("hello world hello world hello world", "hello world", 3),
+            ("Hei og hopp, hei og hallo, hei og hå", "hei og", 3),
+            ("Hei hei hei hei hei", "hei", 5),
+        ]
+)
+def test_extract_line_anaphora_extracts_longest_repeating_sequence(text, expected_phrase, expected_count):
     result = extract_line_anaphora(text)
-    assert result == pytest.approx(expected)
+    actual = result[0]
+
+    assert len(result) == 1
+    assert actual["line_id"] == 0
+    assert actual["phrase"] == expected_phrase
+    assert actual["count"] == expected_count
 
 
 def test_line_final_word_sequences_return_empty_list():
