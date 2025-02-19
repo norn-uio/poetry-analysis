@@ -45,6 +45,20 @@ def test_find_longest_most_repeating_sequence():
     assert actual_count == expected_count
 
 
+def test_ignores_longer_sequence_with_lower_count():
+    # Given 
+    phrases = Counter({"hello": 3, "hello world": 3, "hello world hello world": 1})
+    expected_phrase = "hello world"
+    expected_count = 3
+
+    # When
+    actual_phrase, actual_count = find_longest_anaphora_in_line(phrases)
+
+    # Then
+    assert actual_phrase == expected_phrase
+    assert actual_count == expected_count
+
+
 def test_find_longest_repeating_sequence_returns_None_with_empty_counter():
     # Given 
     phrases = Counter()
