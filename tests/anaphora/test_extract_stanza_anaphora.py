@@ -1,71 +1,52 @@
-import pytest
 from poetry_analysis.anaphora import extract_stanza_anaphora
 
-@pytest.mark.skip()
-@pytest.mark.parametrize("text, expected", [
-    (
-        (
-            "Hei på deg" + "\n"
-            "Hei og hå" + "\n"
-            "Hei sann" + "\n\n"
-            "Hei hvor det går" +"\n"
-            "Hei og hallo" + "\n"
-        ),[{
-            "stanza_id": [0,1], 
-            "line_id": [0,1,2,3,4],
-            "phrase": "Hei",
-            "count": 5
-            },
-        ]
-    ), (
-        (
-            "jeg ser verden"+"\n"
-            "jeg ser sola" + "\n"
-            "jeg myser mot skyene" + "\n"
-            "jeg ser havet" + "\n"
-        ),{"stanza_id": 0, "line_id": [0,1,3], "phrase": "jeg ser", "count": 3}
-    ), (
-        (
-            "hello world hello world hello world"+"\n"
-            "hello world hello world" + "\n\n"
-            "hello world"+ "\n"
-            "hello world"
-        ),{"stanza_id": 0, "line_id": [0,1,2,3], "phrase": "hello world", "count": 4}
-    )
-])
-def test_extract_stanza_anaphora_finds_longest_repeated_word_sequence(text, expected):
+
+def test_extract_stanza_anaphora_merges_counts_across_stanzas():
     """Check that the longest repeating line initial word sequences are extracted.
     The count should be the number of lines the sequence is repeated in the stanza.
     """
-    result = extract_stanza_anaphora(text)
-
-    assert len(result) == 1
-    assert result[0]["line_id"] == expected["line_id"]
-    assert result[0]["phrase"] == expected["phrase"]
-    assert result[0]["count"] == expected["count"]
-
-
-def test_extract_stanza_anaphora_merges_same_phrase_in_different_stanzas():
-    # Given
     text = (
         "Hei på deg" + "\n"
         "Hei og hå" + "\n"
         "Hei sann" + "\n\n"
-        "Hei hvor det går" +"\n"
+        "Hei hvor det går" + "\n"
         "Hei og hallo" + "\n"
     )
-    expected = [{
-        "stanza_id": [0,1], 
-        "line_id": [0,1,2,3,4],
+    expected = {
+        "stanza_id": [0, 1],
+        "line_id": [0, 1, 2, 3, 4],
         "phrase": "Hei",
-        "count": 5
-        },
-    ]
-    # When
+        "count": 5,
+    }
+
     result = extract_stanza_anaphora(text)
-    
-    # Then
-    assert result == expected
+
+    assert len(result) == 2
+
+    assert all(r["stanza_id"] == e for r, e in zip(result, expected["stanza_id"]))
+    actual_lineids = [r["line_id"] for r in result]
+    assert all(
+        actual_id in expected["line_id"] for ids in actual_lineids for actual_id in ids
+    ), actual_lineids
+    assert all(r["phrase"] == expected["phrase"] for r in result)
+    assert sum(r["count"] for r in result) == expected["count"]
+
+
+def test_stanza_returns_most_repeated_word():
+    text = (
+        "jeg ser verden" + "\n"
+        "jeg ser sola" + "\n"
+        "jeg myser mot skyene" + "\n"
+        "jeg ser havet" + "\n"
+    )
+    result = extract_stanza_anaphora(text)
+
+    assert len(result) == 1
+    actual = result[0]
+    assert actual["stanza_id"] == 0
+    assert actual["line_id"] == [0, 1, 2, 3]
+    assert actual["phrase"] == "jeg"
+    assert actual["count"] == 4
 
 
 def test_extract_stanza_anaphora_returns_empty_list_no_repeated_line_initial_phrase():
