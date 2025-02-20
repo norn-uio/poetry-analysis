@@ -1,9 +1,10 @@
 """Anaphora is the repetition of the same line-initial word or phrase
-in a verse, or across consecutive verses in a stanza. 
+in a verse, or across consecutive verses in a stanza.
 
-It can also refer to the repetition of a whole stanza-initial verse line 
+It can also refer to the repetition of a whole stanza-initial verse line
 in consecutive stanzas.
 """
+
 from collections import defaultdict, Counter
 from pathlib import Path
 
@@ -15,7 +16,7 @@ def count_initial_phrases(text: str) -> Counter:
     phrase_counts = Counter()
     words = strip_punctuation(text).split()
     n_words = len(words)
-   
+
     for n in range(1, n_words + 1):
         if len(words) >= n:
             phrase = " ".join(words[:n])
@@ -31,7 +32,11 @@ def find_longest_anaphora(phrases: Counter) -> dict:
         return None, 0
 
     most_common_phrase, highest_count = phrases.most_common()[0]
-    top_phrases = [phrase for phrase, _ in phrases.most_common() if phrases[phrase] == highest_count]
+    top_phrases = [
+        phrase
+        for phrase, _ in phrases.most_common()
+        if phrases[phrase] == highest_count
+    ]
 
     longest_phrase = max(top_phrases, key=len)
     longest_count = phrases[longest_phrase]
@@ -45,7 +50,7 @@ def find_longest_anaphora(phrases: Counter) -> dict:
 
 def extract_line_anaphora(text: str) -> list:
     """Extract word sequences that are repeated at least twice on the same line."""
-    anaphora = [] 
+    anaphora = []
     lines = text.strip().lower().split("\n")
     for i, line in enumerate(lines):
         line_initial_phrases = count_initial_phrases(line)
@@ -59,21 +64,27 @@ def extract_line_anaphora(text: str) -> list:
 def extract_stanza_anaphora(text: str) -> list:
     """Extract line-initial word sequences that are repeated at least twice in each stanza."""
     anaphora = []
-    
+
     stanzas = split_stanzas(text)
     for i, stanza in enumerate(stanzas):
-
-        stanza_anaphora = Counter([phrase for line in stanza for phrase in list(count_initial_phrases(line).keys())])
+        stanza_anaphora = Counter(
+            [
+                phrase
+                for line in stanza
+                for phrase in list(count_initial_phrases(line).keys())
+            ]
+        )
+        # TODO: Ensure we find all anaphoric phrases in the stanza, not just the longest one.
         phrase, count = find_longest_anaphora(stanza_anaphora)
-        
-        
-        line_ids = [l for l, line in enumerate(stanza) if line.startswith(phrase)]
-        anaphora.append({
-            "stanza_id": i, 
-            "line_id": line_ids,
-            "phrase": phrase,
-            "count": count
-        })
+        if count > 1:
+            line_ids = [
+                line_id
+                for line_id, line in enumerate(stanza)
+                if line.startswith(phrase)
+            ]
+            anaphora.append(
+                {"stanza_id": i, "line_id": line_ids, "phrase": phrase, "count": count}
+            )
 
     return anaphora
 
@@ -147,10 +158,12 @@ def extract_anaphora(text: str) -> dict:
 
 if __name__ == "__main__":
     import doctest
+
     doctest.testmod()
 
-        # Parse user arguments
+    # Parse user arguments
     import argparse
+
     parser = argparse.ArgumentParser()
     parser.add_argument("textfile", help="Filepath to the text to analyze.")
     parser.add_argument(
@@ -162,6 +175,8 @@ if __name__ == "__main__":
     filepath = Path(args.textfile)
     text = filepath.read_text()
 
-    output_file = Path(filepath.parent / f"{filepath.stem}_anaphora.json")    
-    annotate(extract_anaphora, text, stanzaic=args.split_stanzas, outputfile=output_file)    
+    output_file = Path(filepath.parent / f"{filepath.stem}_anaphora.json")
+    annotate(
+        extract_anaphora, text, stanzaic=args.split_stanzas, outputfile=output_file
+    )
     print(f"Anaphora saved to file: {output_file}")
