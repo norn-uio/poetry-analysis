@@ -3,15 +3,17 @@ from poetry_analysis.anaphora import extract_line_anaphora
 
 
 @pytest.mark.parametrize(
-        "text, expected_phrase, expected_count",
-        [
-            ("hello hello world", "hello", 2),
-            ("hello world hello world hello world", "hello world", 3),
-            ("Hei og hopp, hei og hallo, hei og hå", "hei og", 3),
-            ("Hei hei hei hei hei", "hei", 5),
-        ]
+    "text, expected_phrase, expected_count",
+    [
+        ("hello hello world", "hello", 2),
+        ("hello world hello world hello world", "hello world", 3),
+        ("Hei og hopp, hei og hallo, hei og hå", "hei og", 3),
+        ("Hei hei hei hei hei", "hei", 5),
+    ],
 )
-def test_extract_line_anaphora_extracts_longest_repeating_sequence(text, expected_phrase, expected_count):
+def test_extract_line_anaphora_extracts_longest_repeating_sequence(
+    text, expected_phrase, expected_count
+):
     result = extract_line_anaphora(text)
     actual = result[0]
 
@@ -25,7 +27,7 @@ def test_line_final_word_sequences_return_empty_list():
     text = (
         "Hei hello world hello world" + "\n"
         "Hey hello hello" + "\n\n"
-        "hallo world world"+ "\n"
+        "hallo world world" + "\n"
         "Ai hello world"
     )
     result = extract_line_anaphora(text)
