@@ -49,7 +49,7 @@ def find_longest_anaphora(phrases: Counter) -> dict:
 
 
 def extract_line_anaphora(text: str) -> list:
-    """Extract word sequences that are repeated at least twice on the same line."""
+    """Extract line initial word sequences that are repeated at least twice on the same line."""
     anaphora = []
     lines = text.strip().lower().split("\n")
     for i, line in enumerate(lines):
