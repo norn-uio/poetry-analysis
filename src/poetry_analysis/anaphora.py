@@ -89,17 +89,6 @@ def extract_stanza_anaphora(text: str) -> list:
     return anaphora
 
 
-def find_anaphora_in_stanza(lines: list) -> list:
-    """Extract line-initial word sequences that are repeated at least twice in the same stanza."""
-    phrase_counts = Counter()
-
-    for line in lines:
-        line_initial_phrases = count_initial_phrases(line)
-        phrase_counts.update(line_initial_phrases)
-
-    return phrase_counts
-
-
 def extract_anaphora(text: str) -> dict:
     """Extract line-initial word sequences that are repeated at least twice.
 
