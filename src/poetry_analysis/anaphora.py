@@ -100,7 +100,6 @@ def extract_stanza_anaphora(stanza: list[str]) -> dict:
     
     return stanza_anaphora
 
-#%%
 def detect_repeating_lines(text: str) -> list:
     """Detect repeating lines in a poem."""
     stanzas = split_stanzas(text)
@@ -120,7 +119,6 @@ def detect_repeating_lines(text: str) -> list:
             
     
 
-#%%
 def extract_anaphora(text: str) -> dict:
     """Extract line-initial word sequences that are repeated at least twice.
 
