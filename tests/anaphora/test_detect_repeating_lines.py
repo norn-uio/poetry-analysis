@@ -13,4 +13,3 @@ def test_detect_repeating_lines_returns_both_linenumber_and_full_line():
     assert result == [
         ([0,2], "Idag er en fin dag"),
     ]
-    
