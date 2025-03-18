@@ -29,9 +29,23 @@ def test_strip_punctuation():
     "indata, expected",
     [
         ([["Kvass", "K V AH2 S"], ["som", "S OAH0 M"], ["kniv", "K N II1 V"]], 3),
-        ([["i", "IH0"], ["daudkjøt", "D AEW2 KJ OE3 T"], ["flengjande", "F L EH2 N J AH0 N D AX0"]], 6),
+        (
+            [
+                ["i", "IH0"],
+                ["daudkjøt", "D AEW2 KJ OE3 T"],
+                ["flengjande", "F L EH2 N J AH0 N D AX0"],
+            ],
+            6,
+        ),
         ([["Sanningstyrst", "S AH2 N IH0 NG S T YY0 RS RT"]], 3),
-        ([["mot", "M OO1 T"], ["ljoset", "J OO1 S AX0"], ["trengjande", "T R EH2 N J AH0 N D AX0"]], 6),
+        (
+            [
+                ["mot", "M OO1 T"],
+                ["ljoset", "J OO1 S AX0"],
+                ["trengjande", "T R EH2 N J AH0 N D AX0"],
+            ],
+            6,
+        ),
     ],
 )
 def test_syllabify_returns_list_of_syllables(indata, expected):

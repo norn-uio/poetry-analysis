@@ -1,5 +1,7 @@
 import pytest
+
 from poetry_analysis.anaphora import extract_anaphora
+
 
 @pytest.mark.skip("Deprecated")
 @pytest.mark.parametrize(
@@ -16,6 +18,7 @@ def test_extract_anaphora_returns_3gram_frequencies_of_3_repeating_word_seqs(tex
     assert result.keys() == pytest.approx(["1-grams", "2-grams", "3-grams"])
     assert len(result.values()) == 3
     assert result["3-grams"].values() == pytest.approx([3])
+
 
 @pytest.mark.skip("Deprecated")
 def test_extract_anaphora_returns_nothing_if_no_words_repeat():

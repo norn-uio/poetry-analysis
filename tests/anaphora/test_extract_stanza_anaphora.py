@@ -13,7 +13,7 @@ def test_extract_stanza_anaphora_returns_dict_with_single_element_list():
     assert all(len(repetitions) == 1 for repetitions in result.values())
 
 
-def test_extract_stanza_anaphora_returns_indices_of_all_occurrences(): 
+def test_extract_stanza_anaphora_returns_indices_of_all_occurrences():
     text = [
         "jeg ser på den hvite himmel,\n",
         "jeg ser på den hvite himmel,\n",
@@ -26,7 +26,8 @@ def test_extract_stanza_anaphora_returns_indices_of_all_occurrences():
 
 
 def test_extract_stanza_anaphora_skips_empty_line():
-    text = ["",
+    text = [
+        "",
         "du ser på den hvite himmel,\n",
         "",
         "jeg ser på den hvite himmel,\n",

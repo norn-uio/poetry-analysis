@@ -1,4 +1,5 @@
 import pytest
+
 from poetry_analysis.anaphora import extract_line_anaphora
 
 

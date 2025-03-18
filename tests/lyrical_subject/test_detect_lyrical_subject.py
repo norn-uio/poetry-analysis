@@ -19,4 +19,3 @@ def test_detects_implicit():
 def test_detects_deixis():
     poem_text = "I går var en fin dag."
     assert detect_lyrical_subject(poem_text)["deixis"] is True
-

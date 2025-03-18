@@ -1,4 +1,5 @@
 import pytest
+
 from poetry_analysis import rhyme_detection as rt
 
 

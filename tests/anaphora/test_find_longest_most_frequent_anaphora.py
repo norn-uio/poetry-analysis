@@ -1,5 +1,6 @@
-from poetry_analysis.anaphora import find_longest_most_frequent_anaphora
 from collections import Counter
+
+from poetry_analysis.anaphora import find_longest_most_frequent_anaphora
 
 
 def test_find_most_repeating_sequence():

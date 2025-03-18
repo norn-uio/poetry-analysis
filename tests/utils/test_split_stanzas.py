@@ -1,4 +1,5 @@
 import pytest
+
 from poetry_analysis.utils import split_stanzas
 
 
@@ -10,7 +11,9 @@ from poetry_analysis.utils import split_stanzas
         ("example_poem_landsmaal", 3, 4),
     ],
 )
-def test_multi_stanza_poem_is_split_into_correct_number_of_stanzas(example_fixture, n_stanzas, n_lines, request):
+def test_multi_stanza_poem_is_split_into_correct_number_of_stanzas(
+    example_fixture, n_stanzas, n_lines, request
+):
     # given example poems
     example = request.getfixturevalue(example_fixture)
     # when

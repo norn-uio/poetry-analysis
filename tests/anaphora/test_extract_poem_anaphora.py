@@ -1,4 +1,5 @@
 import pytest
+
 from poetry_analysis.anaphora import extract_poem_anaphora
 
 
@@ -77,7 +78,7 @@ def test_extract_multiple_anaphora_from_same_stanza():
     )
     result = extract_poem_anaphora(text)
     assert len(result) == 3
-    
+
     assert all(r["stanza_id"] == 0 for r in result)
 
     assert result[0]["phrase"] == "jeg"
