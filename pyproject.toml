@@ -33,4 +33,4 @@ dev = [
 
 
 [tool.pytest.ini_options]
-addopts = "--doctest-modules --cov=src"
+addopts = "--doctest-modules --cov=src --cov-report=term-missing"
