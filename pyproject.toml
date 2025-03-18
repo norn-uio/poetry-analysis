@@ -5,7 +5,7 @@ description = "Tool to parse, annotate and analyse Norwegian poetry."
 authors = [
     {name = "Ingerid Dale", email = "ingerid.dale@nb.no"},
 ]
-dependencies = ["nb-tokenizer>=0.1.0", "pandas>=2.2.3", "convert-pa>=0.1.0"]
+dependencies = ["nb-tokenizer>=0.1.0", "pandas>=2.2.3", "convert-pa>=0.1.0", "pre-commit>=4.1.0"]
 requires-python = ">=3.11"
 readme = "README.md"
 license = {text = "CC BY 4.0"}
