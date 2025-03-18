@@ -1,8 +1,10 @@
 """Anaphora is the repetition of the same line-initial word or phrase
 in a verse, or across consecutive verses in a stanza.
 
-It can also refer to the repetition of a whole stanza-initial verse line
+TODO: It can also refer to the repetition of a whole stanza-initial verse line
 in consecutive stanzas.
+> NOTE: This has not been implemented yet. 
+Anaphora structures only account for the first word in each line. 
 """
 
 from collections import defaultdict, Counter

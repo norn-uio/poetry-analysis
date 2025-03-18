@@ -81,4 +81,3 @@ def test_find_longest_most_frequent_anaphora_returns_most_frequent_count_instead
     # Then
     assert actual_phrase == expected_phrase
     assert actual_count == expected_count
-    
