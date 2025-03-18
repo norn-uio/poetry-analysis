@@ -1,11 +1,10 @@
-import re
 import json
+import re
 import string
-from typing import Generator
 from pathlib import Path
+from typing import Generator
 
-from convert_pa import nofabet_to_ipa, convert_nofabet
-
+from convert_pa import convert_nofabet, nofabet_to_ipa
 
 PUNCTUATION_MARKS = str(
     string.punctuation + "‒.,!€«»’”—⁷⁶⁰–‒––!”-?‒"
@@ -116,4 +115,5 @@ def annotate(func, text: str, stanzaic: bool = False, outputfile: str | Path = N
 
 if __name__ == "__main__":
     import doctest
+
     doctest.testmod()

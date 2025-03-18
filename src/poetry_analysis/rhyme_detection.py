@@ -1,13 +1,13 @@
 # %%
 # rhyme_detection main module!
 
+import json
+import logging
 import re
 import string
-import logging
-import json
+from dataclasses import dataclass
 from pathlib import Path
 
-from dataclasses import dataclass
 from convert_pa import convert_nofabet
 
 from poetry_analysis import utils
@@ -278,6 +278,7 @@ def main(poem_file: str):
 
 if __name__ == "__main__":
     import doctest
+
     doctest.testmod()
 
     import argparse

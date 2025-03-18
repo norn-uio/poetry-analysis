@@ -1,6 +1,5 @@
 import re
 
-
 WORDBAGS = dict(
     explicit_subject=[
         "jeg",
@@ -80,4 +79,5 @@ def add_metadata(poem, lyric_features):
 
 if __name__ == "__main__":
     import doctest
+
     doctest.testmod()

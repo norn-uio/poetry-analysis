@@ -3,14 +3,14 @@ in a verse, or across consecutive verses in a stanza.
 
 TODO: It can also refer to the repetition of a whole stanza-initial verse line
 in consecutive stanzas.
-> NOTE: This has not been implemented yet. 
+> NOTE: This has not been implemented yet.
 This anaphora detection process is based on the repetition of the first word in each line. We will continue with implementing a grading system for how effective the figure is in each poem.
 """
 
-from collections import defaultdict, Counter
+from collections import Counter, defaultdict
 from pathlib import Path
 
-from poetry_analysis.utils import strip_punctuation, annotate, split_stanzas
+from poetry_analysis.utils import annotate, split_stanzas, strip_punctuation
 
 
 def count_initial_phrases(text: str) -> Counter:
@@ -60,8 +60,8 @@ def extract_line_anaphora(text: str) -> list:
     return anaphora
 
 
-def is_successive(items:list): 
-    return [items[i] == items[i-1] + 1 for i, item in enumerate(items)][1:]
+def is_successive(items: list):
+    return [items[i] == items[i - 1] + 1 for i, item in enumerate(items)][1:]
 
 
 def extract_poem_anaphora(text: str) -> list:
@@ -75,7 +75,12 @@ def extract_poem_anaphora(text: str) -> list:
             if len(indeces) <= 1:
                 continue
             if all(is_successive(indeces)):
-                annotation = {"stanza_id": i, "line_id": indeces, "phrase": phrase, "count": len(indeces)}
+                annotation = {
+                    "stanza_id": i,
+                    "line_id": indeces,
+                    "phrase": phrase,
+                    "count": len(indeces),
+                }
                 anaphora.append(annotation)
     return anaphora
 
@@ -84,21 +89,22 @@ def extract_stanza_anaphora(stanza: list[str]) -> dict:
     stanza_anaphora = {}
 
     for line_index, line in enumerate(stanza):
-        if not line: 
+        if not line:
             continue
         first_word = line.split()[0].lower()
-        previous_line = stanza[line_index -1].lower().split()
+        previous_line = stanza[line_index - 1].lower().split()
         try:
             previous_first_word = previous_line[0]
         except IndexError:
             previous_first_word = None
-        
-        if (line_index > 0 and previous_first_word == first_word): 
+
+        if line_index > 0 and previous_first_word == first_word:
             stanza_anaphora[first_word].append(line_index)
         else:
             stanza_anaphora[first_word] = [line_index]
-    
+
     return stanza_anaphora
+
 
 def detect_repeating_lines(text: str) -> list:
     """Detect repeating lines in a poem."""
@@ -113,11 +119,9 @@ def detect_repeating_lines(text: str) -> list:
             total = lines.count(line)
             if total > 1:
                 repeating_lines[line] = [idx]
-    
 
     return [(indeces, line) for line, indeces in repeating_lines.items()]
-            
-    
+
 
 def extract_anaphora(text: str) -> dict:
     """Extract line-initial word sequences that are repeated at least twice.

@@ -39,7 +39,7 @@ def extract_alliteration(text: list[str]) -> list[dict]:
 
     Args:
         text (list): A list of strings, where each string is a line of text.
-    
+
     Example use:
     >>> text = ['Stjerneklare Septembernat Sees Sirius', 'Sydhimlens smukkeste Stjerne']
     >>> extract_alliteration(text)
@@ -48,7 +48,7 @@ def extract_alliteration(text: list[str]) -> list[dict]:
 
     alliterations = []
 
-    for i, line in enumerate(text):   
+    for i, line in enumerate(text):
         words = line.split() if isinstance(line, str) else line
         seen = {}
         for j, word in enumerate(words):
@@ -72,7 +72,6 @@ def extract_alliteration(text: list[str]) -> list[dict]:
                             "words": seen[symbol],
                         }
                     )
-                
 
     return alliterations
 
@@ -80,17 +79,22 @@ def extract_alliteration(text: list[str]) -> list[dict]:
 if __name__ == "__main__":
     # Test the functions with doctest
     import doctest
+
     doctest.testmod()
 
     # Parse user arguments
     import argparse
+
     parser = argparse.ArgumentParser()
     parser.add_argument("textfile", help="Filepath to the text to analyze.")
     parser.add_argument(
         "--split_stanzas", action="store_true", help="Split the text into stanzas."
     )
     parser.add_argument(
-        "-o", "--outputfile", type=Path, help="File path to store results in. Defaults to the same file path and name as the input file, with the additional suffix `_alliteration.json`.",
+        "-o",
+        "--outputfile",
+        type=Path,
+        help="File path to store results in. Defaults to the same file path and name as the input file, with the additional suffix `_alliteration.json`.",
     )
     args = parser.parse_args()
 
@@ -100,4 +104,9 @@ if __name__ == "__main__":
 
     if not args.outputfile:
         args.outputfile = Path(filepath.parent / f"{filepath.stem}_alliteration.json")
-    annotate(extract_alliteration, text, stanzaic=args.split_stanzas, outputfile=args.outputfile)
+    annotate(
+        extract_alliteration,
+        text,
+        stanzaic=args.split_stanzas,
+        outputfile=args.outputfile,
+    )
