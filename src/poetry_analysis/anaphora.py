@@ -4,7 +4,7 @@ in a verse, or across consecutive verses in a stanza.
 TODO: It can also refer to the repetition of a whole stanza-initial verse line
 in consecutive stanzas.
 > NOTE: This has not been implemented yet. 
-Anaphora structures only account for the first word in each line. 
+This anaphora detection process is based on the repetition of the first word in each line. We will continue with implementing a grading system for how effective the figure is in each poem.
 """
 
 from collections import defaultdict, Counter
