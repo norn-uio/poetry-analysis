@@ -53,6 +53,8 @@ def extract_alliteration(text: list[str]) -> list[dict]:
         seen = {}
         for j, word in enumerate(words):
             initial_letter = word[0].lower()
+            if not initial_letter.isalpha():
+                continue
 
             if initial_letter in seen:
                 seen[initial_letter].append(word)
