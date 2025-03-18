@@ -26,7 +26,7 @@ def count_initial_phrases(text: str) -> Counter:
     return phrase_counts
 
 
-def find_longest_anaphora(phrases: Counter) -> dict:
+def find_longest_most_frequent_anaphora(phrases: Counter) -> dict:
     """Find the longest and most repeated word sequence in a line."""
     if not phrases:
         return None, 0
@@ -54,39 +54,56 @@ def extract_line_anaphora(text: str) -> list:
     lines = text.strip().lower().split("\n")
     for i, line in enumerate(lines):
         line_initial_phrases = count_initial_phrases(line)
-        phrase, count = find_longest_anaphora(line_initial_phrases)
+        phrase, count = find_longest_most_frequent_anaphora(line_initial_phrases)
         if count > 1:
             annotation = {"line_id": i, "phrase": phrase, "count": count}
             anaphora.append(annotation)
     return anaphora
 
 
-def extract_stanza_anaphora(text: str) -> list:
+def is_successive(items:list): 
+    return [items[i] == items[i-1] + 1 for i, item in enumerate(items)][1:]
+
+
+def extract_poem_anaphora(text: str) -> list:
     """Extract line-initial word sequences that are repeated at least twice in each stanza."""
     anaphora = []
 
     stanzas = split_stanzas(text)
     for i, stanza in enumerate(stanzas):
-        stanza_anaphora = Counter(
-            [
-                phrase
-                for line in stanza
-                for phrase in list(count_initial_phrases(line).keys())
-            ]
-        )
-        # TODO: Ensure we find all anaphoric phrases in the stanza, not just the longest one.
-        phrase, count = find_longest_anaphora(stanza_anaphora)
-        if count > 1:
-            line_ids = [
-                line_id
-                for line_id, line in enumerate(stanza)
-                if line.startswith(phrase)
-            ]
-            anaphora.append(
-                {"stanza_id": i, "line_id": line_ids, "phrase": phrase, "count": count}
-            )
-
+        stanza_anaphora = extract_stanza_anaphora(stanza)
+        for phrase, indeces in stanza_anaphora.items():
+            if len(indeces) <= 1:
+                continue
+            if all(is_successive(indeces)):
+                annotation = {"stanza_id": i, "line_id": indeces, "phrase": phrase, "count": len(indeces)}
+                anaphora.append(annotation)
     return anaphora
+
+
+def extract_stanza_anaphora(stanza: list[str]) -> dict:
+    stanza_anaphora = {}
+
+    for line_index, line in enumerate(stanza):
+        if not line: 
+            continue
+        first_word = line.split()[0].lower()
+        previous_line = stanza[line_index -1].lower().split()
+        try:
+            previous_first_word = previous_line[0]
+        except IndexError:
+            previous_first_word = None
+        
+        if (line_index > 0 and previous_first_word == first_word): 
+            try:
+                stanza_anaphora[first_word].append(line_index)
+            except KeyError:
+                print(line_index, line)
+                stanza_anaphora[first_word] = [line_index]
+        else:
+            stanza_anaphora[first_word] = [line_index]
+    
+    return stanza_anaphora
 
 
 def extract_anaphora(text: str) -> dict:
