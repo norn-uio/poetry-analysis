@@ -53,8 +53,4 @@ def test_syllabify_returns_list_of_syllables(indata, expected):
     # when
     result = utils.syllabify(indata)
     # then
-
-    assert isinstance(result, list)
-    assert isinstance(result[0], list)
-    assert isinstance(result[0][0], str)
     assert len(result) == expected

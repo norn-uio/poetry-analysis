@@ -11,23 +11,24 @@ PUNCTUATION_MARKS = str(
 )  # Note! The three long dashes look identical, but are different unicode characters
 
 VALID_NUCLEI = [
-    'aa',
-    'ae',
-    'oe',
-    'ou',
-    'ei',
-    'øy',
-    'ai',
-    'oi',
-    'a',
-    'e',
-    'i',
-    'o',
-    'u',
-    'y',
-    'æ',
-    'ø',
-    'å',
+    "aa",
+    "ae",
+    "oe",
+    "ou",
+    "ei",
+    "øy",
+    "ai",
+    "oi",
+    "au",
+    "a",
+    "e",
+    "i",
+    "o",
+    "u",
+    "y",
+    "æ",
+    "ø",
+    "å",
 ]
 
 GRAMMATICAL_SUFFIXES = [
@@ -40,15 +41,20 @@ GRAMMATICAL_SUFFIXES = [
     "en",
 ]
 
+
 def is_grammatical_suffix(string: str) -> bool:
     return string in GRAMMATICAL_SUFFIXES
+
 
 def endswith(sequence: str | list[str], suffix: str) -> bool:
     """Check if a sequence ends with a given suffix."""
     if isinstance(sequence, str):
         return sequence.endswith(suffix)
     elif isinstance(sequence, list):
-        return sequence.copy().pop().endswith(suffix)
+        last_element = sequence.copy().pop()
+        if isinstance(last_element, str):
+            return last_element.endswith(suffix)
+        return False
     return False
 
 
@@ -69,6 +75,17 @@ def strip_punctuation(string: str) -> str:
         if not is_punctuation(char):
             alphanumstr += char
     return strip_redundant_whitespace(alphanumstr)
+
+
+def make_comparable_string(input: list | str) -> str:
+    """Convert a list of strings into a single comparable string."""
+    if isinstance(input, list):
+        string = " ".join(input)
+    else: 
+        string = str(input)
+    string = strip_punctuation(string)
+    string = re.sub(r"[0123]", "", string)  # remove stress markers
+    return string.casefold()
 
 
 def convert_to_syllables(phonemes: str | list, ipa: bool = False) -> list:
