@@ -4,7 +4,7 @@ consonants or consonant clusters.
 
 from pathlib import Path
 
-from poetry_analysis.utils import annotate, gather_stanza_annotations
+from poetry_analysis.utils import annotate
 
 
 def count_alliteration(text: str) -> dict:
