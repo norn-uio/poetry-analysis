@@ -30,6 +30,28 @@ VALID_NUCLEI = [
     'å',
 ]
 
+GRAMMATICAL_SUFFIXES = [
+    "ene",
+    "ane",
+    "et",
+    "te",
+    "er",
+    # "ar", # Too common in short words to filter out
+    "en",
+]
+
+def is_grammatical_suffix(string: str) -> bool:
+    return string in GRAMMATICAL_SUFFIXES
+
+def endswith(sequence: str | list[str], suffix: str) -> bool:
+    """Check if a sequence ends with a given suffix."""
+    if isinstance(sequence, str):
+        return sequence.endswith(suffix)
+    elif isinstance(sequence, list):
+        return sequence.copy().pop().endswith(suffix)
+    return False
+
+
 def is_punctuation(char: str) -> bool:
     """Check if a character is a punctuation mark."""
     return char in PUNCTUATION_MARKS

@@ -57,10 +57,10 @@ def is_nucleus(symbol: str, orthographic: bool = False) -> bool:
     return strip_stress(symbol) in valid_nuclei
 
 
-def has_nucleus(word: str):
-    """Check if a word has a nucleus."""
+def find_nucleus(word: str) -> re.Match:
+    """Check if a word has a valid syllable nucleus."""
     rgx = re.compile(fr"({'|'.join(utils.VALID_NUCLEI)})")
-    return bool(rgx.search(word))
+    return rgx.search(word)
 
 
 def find_last_stressed_syllable(syllables: list) -> list:
@@ -140,19 +140,28 @@ def score_orthographic_rhyme(sequence1: str | list, sequence2: str | list) -> fl
     """
     substring = longest_common_substring(sequence1, sequence2)
 
-    # TODO: if it ends with a grammatical suffix, it should score 0
-
     if not substring:
         return 0
-    if not sequence1.endswith(substring) or not sequence2.endswith(substring):
+    if not utils.endswith(sequence1, substring) or not utils.endswith(sequence2, substring):
         # not an end rhyme
         return 0
-    if not has_nucleus(substring):
+
+    nucleus = find_nucleus(substring)
+    if not nucleus:
+        return 0
+    if utils.is_grammatical_suffix(substring):
+        # only the grammatical suffixes match
+        # e.g. "arbeidet" / "skrevet"
+        return 0
+    if utils.is_grammatical_suffix(substring[nucleus.start():]):
+        # the rhyming part is a grammatical suffix
+        # e.g. "blomster" / "fester"
         return 0
     if substring == sequence1 or substring == sequence2:
         # one of the words is fully contained in the other
         return 0.5
-    if has_nucleus(substring) and (sequence1 != sequence2):
+
+    if nucleus and (sequence1 != sequence2):
         return 1
     # otherwise, assume that the words do not rhyme
     return 0
