@@ -1,4 +1,5 @@
 import pytest
+
 from poetry_analysis import rhyme_detection as rd
 
 
@@ -7,7 +8,7 @@ def test_shared_ending_substring():
     string2 = "skamguld"
 
     result = rd.shared_ending_substring(string1, string2)
-    
+
     assert result == "uld"
 
 
@@ -16,7 +17,7 @@ def test_shared_ending_substring_no_match():
     string2 = "skammen"
 
     result = rd.shared_ending_substring(string1, string2)
-    
+
     assert result == ""
 
 
@@ -25,7 +26,7 @@ def test_shared_ending_substring_transcription():
     string2 = "B OO D"
 
     result = rd.shared_ending_substring(string1, string2).strip()
-    
+
     assert result == "OO D"
 
 
@@ -54,7 +55,8 @@ def test_no_shared_ending_substring_is_found(sequence1, sequence2):
         ("G UH L", "J UH L"),
         ("G UH2 L", "F UH2 L"),
         ("B OO D", "S T OO D"),
-])
+    ],
+)
 def test_shared_ending_substring_phonemic(sequence1, sequence2):
     result = rd.shared_ending_substring(sequence1, sequence2)
     assert result

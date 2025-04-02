@@ -146,7 +146,7 @@ def _score_rhyme(syllable1: list, syllable2: list) -> int:
     return rhyme_score
 
 
-def score_rhyme(sequence1: str , sequence2: str , orthographic: bool = False) -> float:
+def score_rhyme(sequence1: str, sequence2: str, orthographic: bool = False) -> float:
     """Check if two words rhyme and return a rhyming score.
 
     1:      Only the syllable nucleus + coda (=rhyme) match # perfect or proper rhyme
@@ -157,7 +157,9 @@ def score_rhyme(sequence1: str , sequence2: str , orthographic: bool = False) ->
     substring = shared_ending_substring(sequence1, sequence2)
 
     if not substring:
-        logging.debug("No shared ending substring found in %s and %s", sequence1, sequence2)
+        logging.debug(
+            "No shared ending substring found in %s and %s", sequence1, sequence2
+        )
         return 0
 
     nucleus = find_nucleus(substring, orthographic=orthographic)
@@ -170,7 +172,9 @@ def score_rhyme(sequence1: str , sequence2: str , orthographic: bool = False) ->
         # e.g. "arbeidet" / "skrevet"
         return 0
     if utils.is_grammatical_suffix(substring[nucleus.start() :]):
-        logging.debug("the rhyming part is a grammatical suffix: %s", substring[nucleus.start() :])
+        logging.debug(
+            "the rhyming part is a grammatical suffix: %s", substring[nucleus.start() :]
+        )
         # e.g. "blomster" / "fester"
         return 0
 
@@ -221,17 +225,21 @@ def shared_ending_substring(string1: str, string2: str) -> str:
 
     for i in range(1, min_length + 1):
         if string1[-i] != string2[-i]:
-            return string1[-i +1:] if i > 1 else ""
+            return string1[-i + 1 :] if i > 1 else ""
     return string1[-min_length:] if min_length > 0 else ""
 
 
-def find_rhyming_line(current: Verse, previous_lines: list[str], orthographic: bool = False) -> tuple:
+def find_rhyming_line(
+    current: Verse, previous_lines: list[str], orthographic: bool = False
+) -> tuple:
     """Check if the current line rhymes with any of the previous lines."""
 
     for idx, previous in reversed(list(enumerate(previous_lines))):
         if previous.last_token is None or current.last_token is None:
             continue
-        rhyme_score = score_rhyme(previous.last_token, current.last_token, orthographic=orthographic)
+        rhyme_score = score_rhyme(
+            previous.last_token, current.last_token, orthographic=orthographic
+        )
         if rhyme_score > 0:
             return idx, rhyme_score
     return None, 0
@@ -260,7 +268,9 @@ def tag_rhyming_verses(verses: list[list[str]], orthographic: bool = False) -> l
                 text=" ".join(verseline),
                 tokens=verseline,
             )
-            current_verse.last_token = utils.strip_punctuation(current_verse.tokens[-1].casefold())
+            current_verse.last_token = utils.strip_punctuation(
+                current_verse.tokens[-1].casefold()
+            )
         else:
             current_verse = Verse(
                 id_=idx,
@@ -270,10 +280,14 @@ def tag_rhyming_verses(verses: list[list[str]], orthographic: bool = False) -> l
             )
 
             last_token = find_last_stressed_syllable(current_verse.syllables)
-            current_verse.last_token = last_token if last_token is not None else current_verse.syllables[-1]
+            current_verse.last_token = (
+                last_token if last_token is not None else current_verse.syllables[-1]
+            )
             current_verse.last_token = re.sub(r"[0123]", "", current_verse.last_token)
 
-        rhyming_idx, rhyme_score = find_rhyming_line(current_verse, processed, orthographic=orthographic)
+        rhyming_idx, rhyme_score = find_rhyming_line(
+            current_verse, processed, orthographic=orthographic
+        )
 
         if rhyming_idx is not None and rhyme_score > 0:
             rhyming_verse = processed[rhyming_idx]
@@ -330,10 +344,11 @@ def format_annotations(annotations: dict) -> dict:
     for stanza_key, stanza_value in annotations.items():
         formatted_stanza = []
         for verse in stanza_value:
-            formatted_verse = {
-                k: " ".join(map(str, v)) if isinstance(v, list) else v
-                for k, v in verse.items()
-            }
+            # formatted_verse = {
+            #     k: " ".join(map(str, v)) if isinstance(v, list) else v
+            #     for k, v in verse.items()
+            # }
+            formatted_verse = verse.text if verse.text else verse.transcription
             formatted_stanza.append(formatted_verse)
         formatted_annotations[stanza_key] = formatted_stanza
     return formatted_annotations

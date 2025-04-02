@@ -1,13 +1,12 @@
 from poetry_analysis import rhyme_detection as rd
 
 
-
 def test_get_stanza_from_transcription_returns_only_orthogtraphic_words():
-    # Given 
+    # Given
     poem = {
         "text_id": "test_1",
         "line_0": [["E", "E2"], ["m", "M"]],
-        "line_1": [["Det", "D AX0"]]
+        "line_1": [["Det", "D AX0"]],
     }
     # When
     result = rd.get_stanzas_from_transcription(poem, orthographic=True)
@@ -15,12 +14,13 @@ def test_get_stanza_from_transcription_returns_only_orthogtraphic_words():
     assert result[0][0] == ["E", "m"]
     assert result[0][1] == ["Det"]
 
+
 def test_get_stanza_from_transcription_returns_only_pronunciation():
-    # Given 
+    # Given
     poem = {
         "text_id": "test_2",
         "line_0": [["Ensom", "EE2 N S AH0 M"]],
-        "line_1": [["Det", "D AX0"]]
+        "line_1": [["Det", "D AX0"]],
     }
     # When
     result = rd.get_stanzas_from_transcription(poem, orthographic=False)

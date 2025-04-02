@@ -60,7 +60,9 @@ def test_finds_rhyming_orthographic_line(
     current_line = rd.Verse("X", last_token="tuld")
 
     # When
-    verse, score = rd.find_rhyming_line(current_line, previous_orthographic_lines, orthographic=True)
+    verse, score = rd.find_rhyming_line(
+        current_line, previous_orthographic_lines, orthographic=True
+    )
 
     # Then
     # It will return the first rhyming match it finds, i.e. the last line

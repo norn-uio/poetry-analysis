@@ -1,5 +1,3 @@
-import pytest
-
 from poetry_analysis.anaphora import detect_repeating_lines
 
 
