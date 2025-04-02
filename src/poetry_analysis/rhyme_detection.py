@@ -68,9 +68,13 @@ def is_nucleus(symbol: str, orthographic: bool = False) -> bool:
     return strip_stress(symbol) in valid_nuclei
 
 
-def find_nucleus(word: str) -> re.Match:
+def find_nucleus(word: str, orthographic: bool = False) -> re.Match:
     """Check if a word has a valid syllable nucleus."""
-    rgx = re.compile(rf"({'|'.join(utils.VALID_NUCLEI)})")
+    if orthographic:
+        valid_nuclei = utils.VALID_NUCLEI
+    else:
+        valid_nuclei = convert_nofabet.PHONES_NOFABET.get("nuclei")
+    rgx = re.compile(rf"({'|'.join(valid_nuclei)})")
     return rgx.search(word)
 
 
