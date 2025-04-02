@@ -146,27 +146,36 @@ def score_rhyme(syllable1: list, syllable2: list) -> int:
     return rhyme_score
 
 
-def tag_rhyming_verses(transcribed_verses: list) -> list:
+
+def tag_rhyming_verses(verses: list, orthographic: bool = False) -> list:
     """Annotate end rhyme patterns in a poem stanza.
 
     Args:
-        transcribed_verses: list of phonemically transcribed and syllabified verse lines
+        verses: list of words
+        orthographic: if True, the words strings are orthographic,
+            otherwise assume phonemic nofabet transcriptions
     Return:
-        list of annotated verses with transcriptions and rhyme tags
+        list of annotated verses with rhyme scores and rhyme tags
     """
     alphabet = iter(string.ascii_letters)
 
     processed = []  # needs to be a list!
-    # iteratively compare previous lines with current line
-    for idx, current_syllables in enumerate(transcribed_verses):
-        if not current_syllables:  # skip empty lines
+    for idx, verseline in enumerate(verses):
+        if not verseline:
             continue
-        does_rhyme = False
-        for previous_verse in reversed(processed):
-            previous_syll = previous_verse.get("syllables")
-            rhyme_score = score_rhyme(previous_syll, current_syllables)
-            if rhyme_score > 0:
-                rhyme_tag = previous_verse.get("rhyme_tag")
+        if orthographic:
+            current_verse = verseline #utils.split_orthographic_text_into_syllables(verseline)
+        else:
+            current_verse = utils.convert_to_syllables(verseline, ipa=False)            
+        
+        does_rhyme = False    # iteratively compare previous lines with current line
+
+        for previous in reversed(processed):
+            previous_verse = previous.get("verse")
+            rhyme_score = score_rhyme(previous_verse, current_verse)
+        
+        if rhyme_score > 0:
+                rhyme_tag = previous.get("rhyme_tag")
                 does_rhyme = True
                 break
 
@@ -182,7 +191,7 @@ def tag_rhyming_verses(transcribed_verses: list) -> list:
         processed.append(
             dict(
                 verse_id=idx,
-                syllables=current_syllables,
+                verse=current_verse,
                 rhyme_score=rhyme_score,
                 rhyme_tag=rhyme_tag,
             )
@@ -195,7 +204,7 @@ def collate_rhyme_scheme(annotated_stanza: list) -> str:
     return "".join(verse.get("rhyme_tag") for verse in annotated_stanza)
 
 
-def get_stanzas_from_transcription(transcription: dict) -> list:
+def get_stanzas_from_transcription(transcription: dict, orthographic: bool=False) -> list:
     """Parse a dict of transcribed verse lines and return a list of stanzas."""
     n_lines = len(transcription.keys()) - 1  # subtract the text_id key
     logging.debug("Number of lines in poem: %s", n_lines)
@@ -204,8 +213,9 @@ def get_stanzas_from_transcription(transcription: dict) -> list:
     for n in range(n_lines):
         verse = transcription.get(f"line_{n}")
         if len(verse) > 0:
-            syllables = utils.syllabify(verse)
-            stanza.append(syllables)
+            words, pron = zip(*verse)
+            verseline  = list(words if orthographic else pron)
+            stanza.append(verseline)
         else:
             if len(stanza) == 0:
                 continue
@@ -252,7 +262,7 @@ def main(poem_file: str):
     poem_text = json.loads(filepath.read_text())
     poem_id = poem_text.get("text_id")
     logging.debug("Tagging poem: %s", poem_id)
-    stanzas = get_stanzas_from_transcription(poem_text)
+    stanzas = get_stanzas_from_transcription(poem_text, orthographic=False)
     # print(stanzas)
 
     file_annotations = {}
