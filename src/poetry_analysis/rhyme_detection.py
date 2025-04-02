@@ -133,7 +133,7 @@ def score_rhyme(syllable1: list, syllable2: list) -> int:
 
 def score_orthographic_rhyme(sequence1: str | list, sequence2: str | list) -> float:
     """Check if two words rhyme and return a rhyming score.
-    
+
     1:      Only the syllable nucleus + coda (=rhyme) match # perfect or proper rhyme
     0.5:    NØDRIM or lame rhyme. One of the words is fully contained in the other, e.g. 'tusenfryd' / 'fryd'
     0:      No match
@@ -142,7 +142,9 @@ def score_orthographic_rhyme(sequence1: str | list, sequence2: str | list) -> fl
 
     if not substring:
         return 0
-    if not utils.endswith(sequence1, substring) or not utils.endswith(sequence2, substring):
+    if not utils.endswith(sequence1, substring) or not utils.endswith(
+        sequence2, substring
+    ):
         # not an end rhyme
         return 0
 
