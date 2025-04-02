@@ -54,3 +54,16 @@ def test_syllabify_returns_list_of_syllables(indata, expected):
     result = utils.syllabify(indata)
     # then
     assert len(result) == expected
+
+
+@pytest.mark.skip("Not fully implemented yet")
+def test_split_orthographic_text_into_syllables():
+    """Test that orthographic text gets split into syllables"""
+    # given
+    words = ["ensom", "journalist", "ouverture"]
+    syllables = [["en", "som"], ["jour", "na", "list"], ["ou", "ver", "tu", "re"]]
+    # when
+    result = utils.split_orthographic_text_into_syllables(words)
+    # then
+    for actual, syllables in zip(result, syllables):
+        assert actual == syllables

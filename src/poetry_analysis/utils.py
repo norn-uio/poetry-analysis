@@ -81,7 +81,7 @@ def make_comparable_string(input: list | str) -> str:
     """Convert a list of strings into a single comparable string."""
     if isinstance(input, list):
         string = " ".join(input)
-    else: 
+    else:
         string = str(input)
     string = strip_punctuation(string)
     string = re.sub(r"[0123]", "", string)  # remove stress markers
@@ -108,6 +108,116 @@ def syllabify(transcription: list[list]) -> list:
         for syll in convert_to_syllables(pron, ipa=False)
     ]
     return syllables
+
+
+def split_orthographic_text_into_syllables(words: list[str]) -> list:
+    """
+    WORK IN PROGRESS
+    Split orthographic text into syllables using basic rules.
+    This is a simplified implementation and may not handle all edge cases.
+
+    Args:
+        words (list of str): A list of orthographic words, already tokenized
+
+    Returns:
+        list: A list of syllables for each word in the text.
+    """
+    syllables = []
+
+    for word in words:
+        word_syllables = []
+        current_syllable = ""
+
+        for i, char in enumerate(word):
+            current_syllable += char
+
+            # Check if the character is a vowel
+            if char in VALID_NUCLEI:
+                # Check if the next character could be part of the same nucleus
+                is_not_last = i + 1 < len(word)
+                if is_not_last and word[i + 1] in VALID_NUCLEI:
+                    continue
+
+                # Check if the next character could be part of a valid onset
+                if is_not_last and word[i + 1] not in VALID_NUCLEI:
+                    consonant_cluster = char + word[i + 1]
+                    if len(consonant_cluster) > 1 and is_valid_onset(consonant_cluster):
+                        continue
+
+                # Otherwise, split the syllable
+                word_syllables.append(current_syllable)
+                current_syllable = ""
+
+        # Add any remaining characters as a syllable
+        if current_syllable:
+            word_syllables.append(current_syllable)
+
+        syllables.append(word_syllables)
+
+    return syllables
+
+
+def is_valid_onset(phonelist: str) -> bool:
+    """
+    WORK IN PROGRESS
+    Check if a sequence of characters forms a valid onset in Norwegian orthography.
+
+    Args:
+        phonelist (str): A string representing the onset (e.g., "bl", "tr").
+
+    Returns:
+        bool: True if the onset is valid, False otherwise.
+    """
+    # Define valid single consonants and consonant clusters for Norwegian
+    valid_single_consonants = set("bcdfghjklmnpqrstvwxyz")
+    valid_clusters = {
+        "bj",
+        "bl",
+        "br",
+        "dr",
+        "dj",
+        "fl",
+        "fj",
+        "fr",
+        "gl",
+        "gr",
+        "gj",
+        "kj",
+        "kl",
+        "kr",
+        "kn",
+        "kv",
+        "pl",
+        "pj",
+        "pr",
+        "mj",
+        "nj",
+        "sj",
+        "sl",
+        "sm",
+        "sn",
+        "sp",
+        "st",
+        "sv",
+        "tr",
+        "tj",
+        "tl",
+        "vr",
+        "sk",
+        "skr",
+        "spr",
+        "str",
+        "skj",
+        "gn",
+        "hv",
+    }
+
+    if len(phonelist) == 1 and phonelist in valid_single_consonants:
+        return True
+
+    if phonelist in valid_clusters:
+        return True
+    return False
 
 
 def annotate_transcriptions(transcription: list) -> Generator:
