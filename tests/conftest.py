@@ -4,6 +4,63 @@ import pytest
 
 
 @pytest.fixture
+def transcribed_poem_lines():
+    """2132_Forord_no-nb_digibok_2006082400076"""
+    lines = [
+        [
+            "D AX0 R",
+            "V AA1 R",
+            "UU2 F R EH3 D",
+            "IH0",
+            "L AH2 N AX0",
+            "P OA3",
+            "T OAH1 R V AX0",
+            "S T OO1",
+        ],
+        [
+            "EE1 N",
+            "V AH2 N D R AX0 N AX0",
+            "S V EH1 N",
+            "M EE1",
+            "S II1 N",
+            "KJ OE2 P M AH0 N S B OO3 D",
+        ],
+        [
+            "AH0 F",
+            "SJ IH2 N NX0 AX0",
+            "S M YH3 K AX0 R",
+            "L OA1",
+            "D IH1 S K AX0 N",
+            "F UH2 L",
+        ],
+        [
+            "D AX0 R",
+            "V AA1 R",
+            "B AE2 L T AX0 R",
+            "AH0 F",
+            "S IH2 L K AX0",
+            "OA1",
+            "R IH2 NG AX0 R",
+            "AH0 F",
+            "G UH2 L",
+        ],
+    ]
+    return lines
+
+
+@pytest.fixture
+def orthographic_poem_lines():
+    """2132_Forord_no-nb_digibok_2006082400076"""
+    lines = [
+        ["Der", "var", "Ufred", "i", "Landet", "Paa", "Torvet", "stod"],
+        ["En", "vandrende", "Svend", "med", "sin", "Kjøbmandsbod"],
+        ["Af", "skinnende", "Smykker", "laa", "Disken", "fuld"],
+        ["Der", "var", "Bælter", "af", "Silke", "og", "Ringer", "af", "Guld"],
+    ]
+    return lines
+
+
+@pytest.fixture
 def example_poem_landsmaal():
     """Poem ID: 2873_Arne_Garborg_no-nb_digibok_2014073108102"""
     return """Kvass som kniv
