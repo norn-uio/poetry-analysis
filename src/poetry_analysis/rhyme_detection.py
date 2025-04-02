@@ -4,6 +4,7 @@ import re
 import string
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Generator
 
 import numpy as np
 from convert_pa import convert_nofabet
@@ -318,13 +319,14 @@ def get_stanzas_from_transcription(
     transcription: dict, orthographic: bool = False
 ) -> list:
     """Parse a dict of transcribed verse lines and return a list of stanzas."""
-    n_lines = len(transcription.keys()) - 1  # subtract the text_id key
+    line_ids = [x for x in transcription.keys() if x.startswith("line_")]
+    n_lines = len(line_ids)
     logging.debug("Number of lines in poem: %s", n_lines)
     poem = []
     stanza = []
-    for n in range(n_lines):
-        verse = transcription.get(f"line_{n}")
-        if len(verse) > 0:
+    for line_n in line_ids:
+        verse = transcription.get(line_n)
+        if (verse is not None) and (len(verse) > 0):
             words, pron = zip(*verse)
             verseline = list(words if orthographic else pron)
             stanza.append(verseline)
