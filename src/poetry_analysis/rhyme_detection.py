@@ -340,6 +340,15 @@ def get_stanzas_from_transcription(
     return poem
 
 
+def tag_stanzas(stanzas: list, orthographic: bool = False) -> Generator:
+    """Iterate over stanzas and tag verses with a rhyme scheme."""
+    for stanza in stanzas:
+        tagged = tag_rhyming_verses(stanza, orthographic=orthographic)
+        rhyme_scheme = collate_rhyme_scheme(tagged)
+        tagged.insert(0, {"rhyme_scheme": rhyme_scheme})
+        yield tagged
+
+
 def format_annotations(annotations: dict) -> dict:
     """Format lists of lists in the innermost dicts to a single line along with the dict key."""
     formatted_annotations = {}
@@ -350,53 +359,47 @@ def format_annotations(annotations: dict) -> dict:
             #     k: " ".join(map(str, v)) if isinstance(v, list) else v
             #     for k, v in verse.items()
             # }
-            formatted_verse = verse.text if verse.text else verse.transcription
-            formatted_stanza.append(formatted_verse)
+            formatted_stanza.append(verse.dict)
         formatted_annotations[stanza_key] = formatted_stanza
     return formatted_annotations
 
 
-def tag_poem_file(poem_file: str):
-    """Annotate rhyming schemes in a poem.
-
-    Procedure:
-    1. Split a poem into stanzas and verses.
-    2. Transcribe the verses phonemically.
-    3. Group the verse phonemes into syllables.
-    4. Identify the last stressed syllable of a verse.
-    5. Compare the syllable sequence of a verse with
-        those of all previous verses in the same stanza. (NB! Replace "stanza" with "poem"? )
-    6. Extract the rhyming part (i.e. nucleus + coda) of the last stressed syllable
-    7. Score the rhyming:
-        1="only rhymes match", # perfect match
-        0.5="NØDRIM: onset also matches" # lame rhyme: 'tusenfryd' / 'fryd'
-        0="No match"
-    8. Tag the verse with a letter, depending on which line it rhymes with if at all
-    """
-    filepath = Path(poem_file)
-    poem_text = json.loads(filepath.read_text())
-    poem_id = poem_text.get("text_id")
-    logging.debug("Tagging poem: %s", poem_id)
-    stanzas = get_stanzas_from_transcription(poem_text, orthographic=False)
-    # print(stanzas)
-
-    file_annotations = {}
-    for idx, stanza in enumerate(stanzas):
-        tagged = tag_rhyming_verses(stanza)
-        rhyme_scheme = collate_rhyme_scheme(tagged)
-        tagged.insert(0, {"rhyme_scheme": rhyme_scheme})
-        file_annotations[f"stanza_{idx}"] = tagged
-
-    formatted_content = format_annotations(file_annotations)
-    outputfile = filepath.parent / f"{filepath.stem}_rhyme_scheme.json"
-    with outputfile.open("w") as f:
-        f.write(json.dumps(formatted_content, ensure_ascii=False, indent=4))
-
-    logging.debug(
-        "Saved rhyme scheme annotations for poem %s to \n\t%s", poem_id, outputfile
-    )
+def tag_poem_file(poem_file: str, write_to_file: bool = False) -> dict:
+    """Annotate rhyming schemes in a poem from a file."""
     # Assume that the stanzas are independent of each other
     # and that the rhyme scheme is unique to each stanza
+
+    filepath = Path(poem_file)
+
+    if not filepath.exists():
+        raise FileNotFoundError(f"File {filepath} does not exist.")
+    if filepath.suffix == ".json":
+        poem_text = json.loads(filepath.read_text())
+        poem_id = poem_text.get("text_id")
+        orthographic = False
+        stanzas = get_stanzas_from_transcription(poem_text, orthographic=orthographic)
+
+    elif filepath.suffix == ".txt":
+        poem_id = filepath.stem.split("_")[0]
+        poem_text = filepath.read_text()
+        stanzas = utils.split_stanzas(poem_text)
+        orthographic = True
+
+    logging.debug("Tagging poem: %s", poem_id)
+    file_annotations = {
+        idx: stanza
+        for idx, stanza in enumerate(tag_stanzas(stanzas, orthographic=orthographic))
+    }
+
+    if write_to_file:
+        outputfile = filepath.parent / f"{filepath.stem}_rhyme_scheme.json"
+        with outputfile.open("w") as f:
+            f.write(json.dumps(file_annotations, ensure_ascii=False, indent=4))
+
+        logging.debug(
+            "Saved rhyme scheme annotations for poem %s to \n\t%s", poem_id, outputfile
+        )
+    return file_annotations
 
 
 # %%
