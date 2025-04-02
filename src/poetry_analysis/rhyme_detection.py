@@ -210,7 +210,18 @@ def longest_common_substring(string1: str, string2: str) -> str:
     return result
 
 
-def find_rhyming_line(current: str, previous_lines: list[str]) -> tuple:
+def shared_ending_substring(string1: str, string2: str) -> str:
+    """Find the shared substring at the end of two strings."""
+    min_length = min(len(string1), len(string2))
+    if min_length == 0: 
+        return ""
+    for i in range(1, min_length + 1):
+        if string1[-i] != string2[-i]:
+            return string1[-i +1:] if i > 1 else ""
+    return ""
+
+
+def find_rhyming_line(current: Verse, previous_lines: list[str]) -> tuple:
     """Check if the current line rhymes with any of the previous lines."""
 
     for idx, previous in reversed(list(enumerate(previous_lines))):
