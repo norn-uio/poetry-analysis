@@ -279,7 +279,7 @@ def tag_rhyming_verses(verses: list[list[str]], orthographic: bool = False) -> l
                 syllables=utils.convert_to_syllables(verseline, ipa=False),
             )
 
-            last_token = find_last_stressed_syllable(current_verse.syllables)
+            last_token = None  # find_last_stressed_syllable(current_verse.syllables)
             current_verse.last_token = (
                 last_token if last_token is not None else current_verse.syllables[-1]
             )
