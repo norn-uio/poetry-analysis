@@ -274,8 +274,8 @@ def format_annotations(annotations: dict) -> dict:
     return formatted_annotations
 
 
-def main(poem_file: str):
-    """Annotate rhyming schemes in poems.
+def tag_poem_file(poem_file: str):
+    """Annotate rhyming schemes in a poem.
 
     Procedure:
     1. Split a poem into stanzas and verses.
@@ -319,11 +319,8 @@ def main(poem_file: str):
 
 # %%
 
-if __name__ == "__main__":
-    import doctest
-
-    doctest.testmod()
-
+def main():
+    """Main function to run the rhyme detection script."""        
     import argparse
     from datetime import datetime
 
@@ -340,4 +337,13 @@ if __name__ == "__main__":
         today = datetime.today().date()
         logging_file = f"{__file__.split('.')[0]}_{today}.log"
         logging.basicConfig(level=logging.DEBUG, filename=logging_file, filemode="a")
-    main(args.jsonfile)
+    
+    tag_poem_file(args.jsonfile)
+
+
+#if __name__ == "__main__":
+    #import doctest
+
+    #doctest.testmod()
+    
+    main()

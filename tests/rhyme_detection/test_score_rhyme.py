@@ -14,6 +14,13 @@ def test_score_rhyme_returns_1_when_rhyme_has_different_onsets(syllable1, syllab
     result = score_rhyme(syllable1, syllable2)
     assert result == 1
 
+@pytest.mark.skip()
+@pytest.mark.parametrize("seq1,seq2", [[['G R UU1'], ['G R UU1']], [['S OAH0 M'], ['S OAH0 M']]])
+def test_identical_phrases_result_in_noedrim(seq1,seq2):
+    result = score_rhyme(seq1, seq2)
+    #assert output[0].get("rhyme_tag") == output[1].get("rhyme_tag"), output 
+    assert result == 0.5
+
 
 @pytest.mark.parametrize(
     "syllable1, syllable2",

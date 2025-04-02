@@ -17,14 +17,6 @@ def test_tag_rhyming_verses_returns_rhyme_tag():
     assert output[2].get("rhyme_tag") == "a"
     assert output[3].get("rhyme_tag") == "b"
 
-@pytest.mark.skip("Not handled correctly yet")
-@pytest.mark.parametrize("rhymepair", [[['G R UU1'], ['G R UU1']], [['S OAH0 M'], ['S OAH0 M']]])
-def test_identical_phrases_result_in_noedrim(rhymepair):
-    # Given
-    output = rd.tag_rhyming_verses(rhymepair)
-    assert output[0].get("rhyme_tag") == output[1].get("rhyme_tag")    
-    assert output[1].get("rhyme_score") == 0.5
-
 
 def test_tag_rhyming_verses_scores_proper_rhymes_with_1():
     # Given
