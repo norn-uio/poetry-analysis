@@ -140,12 +140,19 @@ def score_orthographic_rhyme(sequence1: str | list, sequence2: str | list) -> fl
     """
     substring = longest_common_substring(sequence1, sequence2)
 
-    if not substring or not has_nucleus(substring):
+    # TODO: if it ends with a grammatical suffix, it should score 0
+
+    if not substring:
+        return 0
+    if not sequence1.endswith(substring) or not sequence2.endswith(substring):
+        # not an end rhyme
+        return 0
+    if not has_nucleus(substring):
         return 0
     if substring == sequence1 or substring == sequence2:
         # one of the words is fully contained in the other
         return 0.5
-    if has_nucleus(substring) and sequence1 != sequence2:
+    if has_nucleus(substring) and (sequence1 != sequence2):
         return 1
     # otherwise, assume that the words do not rhyme
     return 0
@@ -341,9 +348,9 @@ def main():
     tag_poem_file(args.jsonfile)
 
 
-#if __name__ == "__main__":
-    #import doctest
+if __name__ == "__main__":
+    import doctest
 
-    #doctest.testmod()
+    doctest.testmod()
     
     main()
