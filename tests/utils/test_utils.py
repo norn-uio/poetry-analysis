@@ -49,7 +49,7 @@ def test_strip_punctuation():
     ],
 )
 def test_syllabify_returns_list_of_syllables(indata, expected):
-    """Test phonemic transcription and syllable split"""
+    """Test that text gets split into syllables"""
     # when
     result = utils.syllabify(indata)
     # then

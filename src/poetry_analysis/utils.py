@@ -10,6 +10,25 @@ PUNCTUATION_MARKS = str(
     string.punctuation + "‒.,!€«»’”—⁷⁶⁰–‒––!”-?‒"
 )  # Note! The three long dashes look identical, but are different unicode characters
 
+VALID_NUCLEI = [
+    'aa',
+    'ae',
+    'oe',
+    'ou',
+    'ei',
+    'øy',
+    'ai',
+    'oi',
+    'a',
+    'e',
+    'i',
+    'o',
+    'u',
+    'y',
+    'æ',
+    'ø',
+    'å',
+]
 
 def is_punctuation(char: str) -> bool:
     """Check if a character is a punctuation mark."""
@@ -30,7 +49,7 @@ def strip_punctuation(string: str) -> str:
     return strip_redundant_whitespace(alphanumstr)
 
 
-def convert_to_syllables(phonemes: list, ipa=False) -> list:
+def convert_to_syllables(phonemes: str | list, ipa: bool = False) -> list:
     """Turn a sequence of phonemes into syllable groups."""
     transcription = phonemes if isinstance(phonemes, str) else " ".join(phonemes)
     if ipa:
