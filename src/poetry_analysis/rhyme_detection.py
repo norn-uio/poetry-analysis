@@ -40,7 +40,7 @@ def is_stressed(syllable: str | list) -> bool:
     if isinstance(syllable, list):
         syllable = " ".join(syllable)
     result = re.search(r"[123]", syllable)
-    return True if result else False
+    return bool(result)
 
 
 def strip_stress(phoneme: str) -> str:
