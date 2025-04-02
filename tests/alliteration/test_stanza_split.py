@@ -1,6 +1,6 @@
 import pytest
 
-from poetry_analysis.alliteration import gather_stanza_annotations
+from poetry_analysis.utils import gather_stanza_annotations
 
 
 def print_line_number(text: str):
