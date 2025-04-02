@@ -95,7 +95,8 @@ def convert_to_syllables(phonemes: str | list, ipa: bool = False) -> list:
         ipa = nofabet_to_ipa(transcription)
         syllables = ipa.split(".")
     else:
-        syllables = convert_nofabet.nofabet_to_syllables(transcription)
+        nofabet_syllables = convert_nofabet.nofabet_to_syllables(transcription)
+        syllables = [" ".join(syll) for syll in nofabet_syllables]
     return syllables
 
 
