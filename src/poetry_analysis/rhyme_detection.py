@@ -1,6 +1,3 @@
-# %%
-# rhyme_detection main module!
-
 import json
 import logging
 import re
@@ -8,6 +5,7 @@ import string
 from dataclasses import dataclass
 from pathlib import Path
 
+import numpy as np
 from convert_pa import convert_nofabet
 
 from poetry_analysis import utils
@@ -50,10 +48,19 @@ def strip_stress(phoneme: str) -> str:
     return phoneme.strip("0123")
 
 
-def is_nucleus(phoneme: str) -> bool:
-    """Check if a phoneme is a vowel."""
-    syll_nuclei = convert_nofabet.PHONES_NOFABET.get("nuclei")
-    return True if strip_stress(phoneme) in syll_nuclei else False
+def is_nucleus(symbol: str, orthographic: bool = False) -> bool:
+    """Check if a phoneme or a letter is a valid syllable nucleus."""
+    if orthographic:
+        valid_nuclei = utils.VALID_NUCLEI
+    else:
+        valid_nuclei = convert_nofabet.PHONES_NOFABET.get("nuclei")
+    return strip_stress(symbol) in valid_nuclei
+
+
+def has_nucleus(word: str):
+    """Check if a word has a nucleus."""
+    rgx = re.compile(fr"({'|'.join(utils.VALID_NUCLEI)})")
+    return bool(rgx.search(word))
 
 
 def find_last_stressed_syllable(syllables: list) -> list:
@@ -80,28 +87,6 @@ def remove_syllable_onset(syllable: list) -> list:
         if is_nucleus(phone):
             return syllable[idx:]
     logging.debug("No nucleus found in %s", syllable)
-
-
-"""
-TODO: Fiks feil med NoneType
-
-Traceback (most recent call last):
-  File "/home/ingeridd/prosjekter/NORN-poems/src/poetry_analysis/rhyme_detection.py", line 264, in <module>
-    main(args.jsonfile)
-  File "/home/ingeridd/prosjekter/NORN-poems/src/poetry_analysis/rhyme_detection.py", line 229, in main
-    tagged = tag_rhyming_verses(stanza)
-             ^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/ingeridd/prosjekter/NORN-poems/src/poetry_analysis/rhyme_detection.py", line 144, in tag_rhyming_verses
-    rhyme_score = score_rhyme(previous_syll, current_syllables)
-                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/ingeridd/prosjekter/NORN-poems/src/poetry_analysis/rhyme_detection.py", line 102, in score_rhyme
-    if do_syll_seqs_rhyme(last_syll1, last_syll2):
-       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/home/ingeridd/prosjekter/NORN-poems/src/poetry_analysis/rhyme_detection.py", line 87, in do_syll_seqs_rhyme
-    if all(strip_stress(s1) == strip_stress(s2) for s1, s2 in zip(syll1, syll2)):
-                                                              ^^^^^^^^^^^^^^^^^
-TypeError: 'NoneType' object is not iterable
-"""
 
 
 def do_syll_seqs_rhyme(syll1: list, syll2: list):
@@ -146,6 +131,49 @@ def score_rhyme(syllable1: list, syllable2: list) -> int:
     return rhyme_score
 
 
+def score_orthographic_rhyme(sequence1: str | list, sequence2: str | list) -> float:
+    """Check if two words rhyme and return a rhyming score.
+    
+    1:      Only the syllable nucleus + coda (=rhyme) match # perfect or proper rhyme
+    0.5:    NØDRIM or lame rhyme. One of the words is fully contained in the other, e.g. 'tusenfryd' / 'fryd'
+    0:      No match
+    """
+    substring = longest_common_substring(sequence1, sequence2)
+
+    if not substring or not has_nucleus(substring):
+        return 0
+    if substring == sequence1 or substring == sequence2:
+        # one of the words is fully contained in the other
+        return 0.5
+    if has_nucleus(substring) and sequence1 != sequence2:
+        return 1
+    # otherwise, assume that the words do not rhyme
+    return 0
+
+
+def longest_common_substring(string1: str, string2: str) -> str:
+    """Find the longest common substring between two strings.
+    
+    Implementation based on the pseudocode from:
+    https://en.wikipedia.org/wiki/Longest_common_substring#Dynamic_programming
+    """
+    m = len(string1)
+    n = len(string2)
+    L = np.zeros((m + 1, n + 1))
+    z = 0
+    result = ""
+
+    for i in range(1, m + 1):
+        for j in range(1, n + 1):
+            if string1[i - 1] == string2[j - 1]:
+                L[i][j] = L[i - 1][j - 1] + 1
+                if L[i][j] > z:
+                    z = L[i][j]
+                    result = string1[(i - int(z)) : i]
+            else:
+                L[i][j] = 0
+    return result
+
 
 def tag_rhyming_verses(verses: list, orthographic: bool = False) -> list:
     """Annotate end rhyme patterns in a poem stanza.
@@ -172,9 +200,14 @@ def tag_rhyming_verses(verses: list, orthographic: bool = False) -> list:
 
         for previous in reversed(processed):
             previous_verse = previous.get("verse")
-            rhyme_score = score_rhyme(previous_verse, current_verse)
-        
-        if rhyme_score > 0:
+            if orthographic:         
+                prev_last_word = previous_verse[-1]
+                cur_last_word = current_verse[-1]
+                rhyme_score = score_orthographic_rhyme(prev_last_word, cur_last_word)
+            else:
+                rhyme_score = score_rhyme(previous_verse, current_verse)
+
+            if rhyme_score > 0:
                 rhyme_tag = previous.get("rhyme_tag")
                 does_rhyme = True
                 break
