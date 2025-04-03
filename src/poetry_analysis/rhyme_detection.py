@@ -342,26 +342,15 @@ def get_stanzas_from_transcription(
 
 def tag_stanzas(stanzas: list, orthographic: bool = False) -> Generator:
     """Iterate over stanzas and tag verses with a rhyme scheme."""
-    for stanza in stanzas:
+    for idx, stanza in enumerate(stanzas):
         tagged = tag_rhyming_verses(stanza, orthographic=orthographic)
         rhyme_scheme = collate_rhyme_scheme(tagged)
-        tagged.insert(0, {"rhyme_scheme": rhyme_scheme})
-        yield tagged
 
-
-def format_annotations(annotations: dict) -> dict:
-    """Format lists of lists in the innermost dicts to a single line along with the dict key."""
-    formatted_annotations = {}
-    for stanza_key, stanza_value in annotations.items():
-        formatted_stanza = []
-        for verse in stanza_value:
-            # formatted_verse = {
-            #     k: " ".join(map(str, v)) if isinstance(v, list) else v
-            #     for k, v in verse.items()
-            # }
-            formatted_stanza.append(verse.dict)
-        formatted_annotations[stanza_key] = formatted_stanza
-    return formatted_annotations
+        yield {
+            "stanza_id": idx,
+            "rhyme_scheme": rhyme_scheme,
+            "verses": [verse.dict for verse in tagged],
+        }
 
 
 def tag_poem_file(poem_file: str, write_to_file: bool = False) -> dict:
@@ -386,10 +375,7 @@ def tag_poem_file(poem_file: str, write_to_file: bool = False) -> dict:
         orthographic = True
 
     logging.debug("Tagging poem: %s", poem_id)
-    file_annotations = {
-        idx: stanza
-        for idx, stanza in enumerate(tag_stanzas(stanzas, orthographic=orthographic))
-    }
+    file_annotations = list(tag_stanzas(stanzas))
 
     if write_to_file:
         outputfile = filepath.parent / f"{filepath.stem}_rhyme_scheme.json"
