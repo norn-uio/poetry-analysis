@@ -80,24 +80,6 @@ def find_nucleus(word: str, orthographic: bool = False) -> re.Match:
     return rgx.search(word)
 
 
-def find_last_stressed_syllable(syllables: list) -> list:
-    for idx, syll in reversed(list(enumerate(syllables))):
-        if is_stressed(syll):
-            # flatten the rhyming syllable sequence
-            stressed = [s for rhyme in syllables[idx:] for s in rhyme]
-            return stressed
-
-
-def find_syllable_rhyme(syllables: list) -> list:
-    """Identify the rhyming part of a verse.
-
-    Args:
-        syllables: nested list of lists of phonemes
-    """
-    stressed = find_last_stressed_syllable(syllables)
-    return remove_syllable_onset(stressed)
-
-
 def remove_syllable_onset(syllable: list) -> list:
     """Split a syllable nucleus and coda from the onset to find the rhyming part of the syllable."""
     for idx, phone in enumerate(syllable):
@@ -111,41 +93,6 @@ def do_syll_seqs_rhyme(syll1: list, syll2: list):
     if all(strip_stress(s1) == strip_stress(s2) for s1, s2 in zip(syll1, syll2)):
         return True
     return False
-
-
-def _score_rhyme(syllable1: list, syllable2: list) -> int:
-    """Check if two syllable sequences rhyme, and return a rhyming score.
-
-    If the onset, nucleus and coda of two different syllable sequences are the same,
-        the score is 0.5. (Nødrim, e.g. "fryd" and "fryd")
-    If the rhyming parts (without onsets) of two syllable sequences have the same phonemes, the score is 1.
-    If they don't match at all, the score is 0.
-    """
-    last_syll1 = find_last_stressed_syllable(syllable1)
-    last_syll2 = find_last_stressed_syllable(syllable2)
-    try:
-        is_rhyming = do_syll_seqs_rhyme(last_syll1, last_syll2)
-    except TypeError:
-        logging.error("Error in syllable comparison: %s and %s", last_syll1, last_syll2)
-        return 0
-    if is_rhyming:
-        logging.debug("NØDRIM: %s and %s", last_syll1, last_syll2)
-        return 0.5
-
-    rhyme1 = find_syllable_rhyme(syllable1)
-    rhyme2 = find_syllable_rhyme(syllable2)
-    try:
-        is_rhyming = do_syll_seqs_rhyme(rhyme1, rhyme2)
-    except TypeError:
-        logging.error("Error in syllable comparison: %s and %s", rhyme1, rhyme2)
-        return 0
-    if is_rhyming:
-        logging.debug("Rhyme: %s and %s", rhyme1, rhyme2)
-        rhyme_score = 1
-    else:
-        # logging.debug("No rhyme: %s and %s", rhyme1, rhyme2)
-        rhyme_score = 0
-    return rhyme_score
 
 
 def score_rhyme(sequence1: str, sequence2: str, orthographic: bool = False) -> float:
@@ -231,6 +178,16 @@ def shared_ending_substring(string1: str, string2: str) -> str:
     return string1[-min_length:] if min_length > 0 else ""
 
 
+def find_last_stressed_syllable(syll):
+    """Find the last stressed syllable in a list of syllables."""
+    n = len(syll)
+
+    for i in range(1, n + 1):
+        if re.search(r"[123]", syll[-i]):
+            return syll[-i:]
+    return syll[:]
+
+
 def find_rhyming_line(
     current: Verse, previous_lines: list[str], orthographic: bool = False
 ) -> tuple:
@@ -281,11 +238,8 @@ def tag_rhyming_verses(verses: list[list[str]], orthographic: bool = False) -> l
                 syllables=utils.convert_to_syllables(verseline, ipa=False),
             )
 
-            last_token = None  # find_last_stressed_syllable(current_verse.syllables)
-            current_verse.last_token = (
-                last_token if last_token is not None else current_verse.syllables[-1]
-            )
-            current_verse.last_token = re.sub(r"[0123]", "", current_verse.last_token)
+            last_token = " ".join(find_last_stressed_syllable(current_verse.syllables))
+            current_verse.last_token = re.sub(r"[0123]", "", last_token)
 
         rhyming_idx, rhyme_score = find_rhyming_line(
             current_verse, processed, orthographic=orthographic
