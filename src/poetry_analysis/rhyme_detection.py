@@ -265,13 +265,13 @@ def tag_rhyming_verses(verses: list[list[str]], orthographic: bool = False) -> l
             continue
 
         if orthographic:
+            tokens = tokenize(verseline)
+            last = tokens[-1] if not utils.is_punctuation(tokens[-1]) else tokens[-2]
             current_verse = Verse(
                 id_=idx,
                 text=verseline,
-                tokens=tokenize(verseline),
-            )
-            current_verse.last_token = utils.strip_punctuation(
-                current_verse.tokens[-1].casefold()
+                tokens=tokens,
+                last_token=last.casefold(),
             )
         else:
             current_verse = Verse(
