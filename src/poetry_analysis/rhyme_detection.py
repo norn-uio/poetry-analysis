@@ -223,7 +223,13 @@ def tag_rhyming_verses(verses: list[list[str]], orthographic: bool = False) -> l
 
         if orthographic:
             tokens = tokenize(verseline)
-            last = tokens[-1] if not utils.is_punctuation(tokens[-1]) else tokens[-2]
+            try:
+                last = (
+                    tokens[-1] if not utils.is_punctuation(tokens[-1]) else tokens[-2]
+                )
+            except IndexError:
+                logging.debug("No tokens found in %s", verseline)
+                continue
             current_verse = Verse(
                 id_=idx,
                 text=verseline,
