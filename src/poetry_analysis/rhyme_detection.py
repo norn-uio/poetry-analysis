@@ -8,6 +8,7 @@ from typing import Generator
 
 import numpy as np
 from convert_pa import convert_nofabet
+from nb_tokenizer import tokenize
 
 from poetry_analysis import utils
 
@@ -266,8 +267,8 @@ def tag_rhyming_verses(verses: list[list[str]], orthographic: bool = False) -> l
         if orthographic:
             current_verse = Verse(
                 id_=idx,
-                text=" ".join(verseline),
-                tokens=verseline,
+                text=verseline,
+                tokens=tokenize(verseline),
             )
             current_verse.last_token = utils.strip_punctuation(
                 current_verse.tokens[-1].casefold()
@@ -375,7 +376,8 @@ def tag_poem_file(poem_file: str, write_to_file: bool = False) -> dict:
         orthographic = True
 
     logging.debug("Tagging poem: %s", poem_id)
-    file_annotations = list(tag_stanzas(stanzas))
+
+    file_annotations = list(tag_stanzas(stanzas, orthographic=orthographic))
 
     if write_to_file:
         outputfile = filepath.parent / f"{filepath.stem}_rhyme_scheme.json"
