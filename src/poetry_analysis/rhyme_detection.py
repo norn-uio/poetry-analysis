@@ -188,6 +188,14 @@ def find_last_stressed_syllable(syll):
     return syll[:]
 
 
+def find_last_word(tokens: list[str]) -> str:
+    """Find the last word in a list of tokens."""
+    for token in reversed(tokens):
+        if not utils.is_punctuation(token):
+            return token
+    return ""
+
+
 def find_rhyming_line(
     current: Verse, previous_lines: list[str], orthographic: bool = False
 ) -> tuple:
@@ -223,29 +231,27 @@ def tag_rhyming_verses(verses: list[list[str]], orthographic: bool = False) -> l
 
         if orthographic:
             tokens = tokenize(verseline)
-            try:
-                last = (
-                    tokens[-1] if not utils.is_punctuation(tokens[-1]) else tokens[-2]
-                )
-            except IndexError:
+            last_word = find_last_word(tokens)
+            if not last_word:
                 logging.debug("No tokens found in %s", verseline)
                 continue
             current_verse = Verse(
                 id_=idx,
                 text=verseline,
                 tokens=tokens,
-                last_token=last.casefold(),
+                last_token=last_word.casefold(),
             )
         else:
+            syllables = utils.convert_to_syllables(verseline, ipa=False)
+            last_syllable = " ".join(find_last_stressed_syllable(syllables))
+
             current_verse = Verse(
                 id_=idx,
                 transcription="\t".join(verseline),
                 tokens=verseline,
-                syllables=utils.convert_to_syllables(verseline, ipa=False),
+                syllables=syllables,
+                last_token=re.sub(r"[0123]", "", last_syllable),
             )
-
-            last_token = " ".join(find_last_stressed_syllable(current_verse.syllables))
-            current_verse.last_token = re.sub(r"[0123]", "", last_token)
 
         rhyming_idx, rhyme_score = find_rhyming_line(
             current_verse, processed, orthographic=orthographic
