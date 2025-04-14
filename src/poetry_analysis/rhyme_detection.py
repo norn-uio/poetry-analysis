@@ -330,14 +330,14 @@ def tag_poem_file(poem_file: str, write_to_file: bool = False) -> dict:
     if not filepath.exists():
         raise FileNotFoundError(f"File {filepath} does not exist.")
     if filepath.suffix == ".json":
-        poem_text = json.loads(filepath.read_text())
+        poem_text = json.loads(filepath.read_text(encoding="utf-8"))
         poem_id = poem_text.get("text_id")
         orthographic = False
         stanzas = get_stanzas_from_transcription(poem_text, orthographic=orthographic)
 
     elif filepath.suffix == ".txt":
         poem_id = filepath.stem.split("_")[0]
-        poem_text = filepath.read_text()
+        poem_text = filepath.read_text(encoding="utf-8")
         stanzas = utils.split_stanzas(poem_text)
         orthographic = True
 
