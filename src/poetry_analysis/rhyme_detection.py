@@ -76,21 +76,22 @@ def is_nucleus(symbol: str, orthographic: bool = False) -> bool:
     if orthographic:
         valid_nuclei = utils.VALID_NUCLEI
     else:
-        valid_nuclei = convert_nofabet.PHONES_NOFABET.get("nuclei")
+        valid_nuclei = convert_nofabet.PHONES_NOFABET["nuclei"]
     return strip_stress(symbol) in valid_nuclei
 
 
-def find_nucleus(word: str, orthographic: bool = False) -> re.Match:
+def find_nucleus(word: str, orthographic: bool = False) -> re.Match | None:
     """Check if a word has a valid syllable nucleus."""
     if orthographic:
         valid_nuclei = utils.VALID_NUCLEI
     else:
-        valid_nuclei = convert_nofabet.PHONES_NOFABET.get("nuclei")
+        valid_nuclei = convert_nofabet.PHONES_NOFABET["nuclei"]
     rgx = re.compile(rf"({'|'.join(valid_nuclei)})")
-    return rgx.search(word)
+    nucleus = rgx.search(word)
+    return nucleus
 
 
-def remove_syllable_onset(syllable: list) -> list:
+def remove_syllable_onset(syllable: list) -> list | None:
     """Split a syllable nucleus and coda from the onset to find the rhyming part of the syllable."""
     for idx, phone in enumerate(syllable):
         if is_nucleus(phone):
@@ -98,7 +99,7 @@ def remove_syllable_onset(syllable: list) -> list:
     logging.debug("No nucleus found in %s", syllable)
 
 
-def do_syll_seqs_rhyme(syll1: list, syll2: list):
+def do_syll_seqs_rhyme(syll1: list, syll2: list) -> bool:
     """Check  if each syllable in two syllable sequences are identical, apart from the stress marker."""
     if all(strip_stress(s1) == strip_stress(s2) for s1, s2 in zip(syll1, syll2)):
         return True
@@ -207,7 +208,7 @@ def find_last_word(tokens: list[str]) -> str:
 
 
 def find_rhyming_line(
-    current: Verse, previous_lines: list[str], orthographic: bool = False
+    current: Verse, previous_lines: list[Verse], orthographic: bool = False
 ) -> tuple:
     """Check if the current line rhymes with any of the previous lines."""
 
@@ -222,7 +223,7 @@ def find_rhyming_line(
     return None, 0
 
 
-def tag_rhyming_verses(verses: list[list[str]], orthographic: bool = False) -> list:
+def tag_rhyming_verses(verses: list, orthographic: bool = False) -> list:
     """Annotate end rhyme patterns in a poem stanza.
 
     Args:
@@ -330,7 +331,7 @@ def tag_stanzas(stanzas: list, orthographic: bool = False) -> Generator:
         }
 
 
-def tag_poem_file(poem_file: str, write_to_file: bool = False) -> dict:
+def tag_poem_file(poem_file: str, write_to_file: bool = False) -> list:
     """Annotate rhyming schemes in a poem from a file."""
     # Assume that the stanzas are independent of each other
     # and that the rhyme scheme is unique to each stanza
