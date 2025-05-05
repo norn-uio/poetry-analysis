@@ -49,6 +49,16 @@ def is_stressed(syllable: str | list) -> bool:
         1 - Primary stress with toneme 1
         2 - Primary stress with toneme 2
         3 - Secondary stress
+
+    Example:
+        >>> is_stressed("a1")
+        True
+        >>> is_stressed("a0")
+        False
+        >>> is_stressed(["a", "1"])
+        True
+        >>> is_stressed(["a", "0"])
+        False
     """
     if isinstance(syllable, list):
         syllable = " ".join(syllable)
@@ -366,7 +376,16 @@ def main():
 
     parser = argparse.ArgumentParser(description="Tag rhyme schemes in a poem.")
     parser.add_argument(
-        "jsonfile", type=str, help="Path to a json file with phonemic transcriptions."
+        "-f",
+        "--jsonfile",
+        type=str,
+        help="Path to a json file with phonemic transcriptions.",
+    )
+    parser.add_argument(
+        "-t",
+        "--doctest",
+        action="store_true",
+        help="Run doctests in the module.",
     )
     parser.add_argument(
         "-v", "--verbose", action="store_true", help="Set logging level to debug."
@@ -378,12 +397,16 @@ def main():
         logging_file = f"{__file__.split('.')[0]}_{today}.log"
         logging.basicConfig(level=logging.DEBUG, filename=logging_file, filemode="a")
 
-    tag_poem_file(args.jsonfile)
+    if args.jsonfile:
+        tag_poem_file(args.jsonfile, write_to_file=True)
+
+    if args.doctest:
+        import doctest
+
+        logging.debug("Running doctests...")
+        doctest.testmod(verbose=True)
+        logging.info("Doctests passed.")
 
 
 if __name__ == "__main__":
-    import doctest
-
-    doctest.testmod()
-
     main()
