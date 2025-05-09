@@ -4,11 +4,13 @@ in a verse, or across consecutive verses in a stanza.
 TODO: It can also refer to the repetition of a whole stanza-initial verse line
 in consecutive stanzas.
 > NOTE: This has not been implemented yet.
-This anaphora detection process is based on the repetition of the first word in each line. We will continue with implementing a grading system for how effective the figure is in each poem.
+This anaphora detection process is based on the repetition of the first word in each line.
+We will continue with implementing a grading system for how effective the figure is in each poem.
 """
 
 from collections import Counter, defaultdict
 from pathlib import Path
+from typing import Generator
 
 from poetry_analysis.utils import annotate, split_stanzas, strip_punctuation
 
@@ -31,7 +33,7 @@ def count_initial_phrases(text: str) -> Counter:
 def find_longest_most_frequent_anaphora(phrases: Counter) -> dict:
     """Find the longest and most repeated word sequence in a line."""
     if not phrases:
-        return None, 0
+        return None, 0  # type: ignore
 
     _, highest_count = phrases.most_common()[0]
     top_phrases = [
@@ -44,7 +46,7 @@ def find_longest_most_frequent_anaphora(phrases: Counter) -> dict:
     longest_count = phrases[longest_phrase]
 
     annotation = (longest_phrase, longest_count)
-    return annotation
+    return annotation  # type: ignore
 
 
 def extract_line_anaphora(text: str) -> list:
@@ -71,30 +73,25 @@ def extract_poem_anaphora(text: str) -> list:
     stanzas = split_stanzas(text)
     for i, stanza in enumerate(stanzas):
         stanza_anaphora = extract_stanza_anaphora(stanza)
-        for phrase, indeces in stanza_anaphora.items():
-            if len(indeces) <= 1:
-                continue
-            if all(is_successive(indeces)):
-                annotation = {
-                    "stanza_id": i,
-                    "line_id": indeces,
-                    "phrase": phrase,
-                    "count": len(indeces),
-                }
-                anaphora.append(annotation)
+
+        for item in filter_anaphora(stanza_anaphora):
+            item["stanza_id"] = i
+            anaphora.append(item)
+
     return anaphora
 
 
-def extract_stanza_anaphora(stanza: list[str]) -> dict:
+def extract_stanza_anaphora(stanza: list[str], n_words: int = 1) -> dict:
+    """Gather indeces for all lines that a line-initial word repeats across successively."""
     stanza_anaphora = {}
 
     for line_index, line in enumerate(stanza):
         if not line:
             continue
-        first_word = line.split()[0].lower()
+        first_word = line.split()[n_words - 1].lower()
         previous_line = stanza[line_index - 1].lower().split()
         try:
-            previous_first_word = previous_line[0]
+            previous_first_word = previous_line[n_words - 1]
         except IndexError:
             previous_first_word = None
 
@@ -104,6 +101,19 @@ def extract_stanza_anaphora(stanza: list[str]) -> dict:
             stanza_anaphora[first_word] = [line_index]
 
     return stanza_anaphora
+
+
+def filter_anaphora(stanza_anaphora: dict) -> Generator:
+    for phrase, indeces in stanza_anaphora.items():
+        if len(indeces) <= 1:
+            continue
+        if all(is_successive(indeces)):
+            annotation = {
+                "line_id": indeces,
+                "phrase": phrase,
+                "count": len(indeces),
+            }
+            yield annotation
 
 
 def detect_repeating_lines(text: str) -> list:
