@@ -30,7 +30,7 @@ def count_initial_phrases(text: str) -> Counter:
     return phrase_counts
 
 
-def find_longest_most_frequent_anaphora(phrases: Counter) -> dict:
+def find_longest_most_frequent_anaphora(phrases: Counter) -> tuple:
     """Find the longest and most repeated word sequence in a line."""
     if not phrases:
         return None, 0  # type: ignore
@@ -45,8 +45,7 @@ def find_longest_most_frequent_anaphora(phrases: Counter) -> dict:
     longest_phrase = max(top_phrases, key=len)
     longest_count = phrases[longest_phrase]
 
-    annotation = (longest_phrase, longest_count)
-    return annotation  # type: ignore
+    return longest_phrase, longest_count
 
 
 def extract_line_anaphora(text: str) -> list:
