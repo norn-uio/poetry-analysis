@@ -340,16 +340,16 @@ def tag_poem_file(poem_file: str, write_to_file: bool = False) -> list:
 
     if not filepath.exists():
         raise FileNotFoundError(f"File {filepath} does not exist.")
+    file_content = filepath.read_text(encoding="utf-8")
     if filepath.suffix == ".json":
-        poem_text = json.loads(filepath.read_text(encoding="utf-8"))
-        poem_id = poem_text.get("text_id")
+        poem = json.loads(file_content)
+        poem_id = poem.get("text_id")
         orthographic = False
-        stanzas = get_stanzas_from_transcription(poem_text, orthographic=orthographic)
+        stanzas = get_stanzas_from_transcription(poem, orthographic=orthographic)
 
     elif filepath.suffix == ".txt":
         poem_id = filepath.stem.split("_")[0]
-        poem_text = filepath.read_text(encoding="utf-8")
-        stanzas = utils.split_stanzas(poem_text)
+        stanzas = utils.split_stanzas(file_content)
         orthographic = True
 
     logging.debug("Tagging poem: %s", poem_id)
@@ -365,9 +365,6 @@ def tag_poem_file(poem_file: str, write_to_file: bool = False) -> list:
             "Saved rhyme scheme annotations for poem %s to \n\t%s", poem_id, outputfile
         )
     return file_annotations
-
-
-# %%
 
 
 def main():
