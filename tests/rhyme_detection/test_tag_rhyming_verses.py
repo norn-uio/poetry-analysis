@@ -17,7 +17,7 @@ def test_orthographic_verses_return_correct_rhyme_tag():
         "Der var Ufred i Landet Paa Torvet stod -",
         "En vandrende Svend med sin Kjøbmandsbod",
         "Af skinnende Smykker laa Disken fuld!",
-        "Der var Bælter af Silke og Ringer af Guld",
+        "Der var Bælter af Silke og Ringer af GULD",
     ]
     result = rd.tag_rhyming_verses(verses, orthographic=True)
     assert result[0].rhyme_tag == result[1].rhyme_tag
