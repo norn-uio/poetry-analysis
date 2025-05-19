@@ -35,3 +35,9 @@ def test_repeated_phrases_are_counted():
     assert result["ett ord i en"] == 3
     assert result["ett ord i en frase"] == 1
     assert result.most_common(1) == [("ett", 3)]
+
+
+def test_lowercasing():
+    text = "Hei hei hei hei Hei"
+    result = count_initial_phrases(text)
+    assert result["hei"] == 5
