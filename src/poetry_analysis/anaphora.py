@@ -12,22 +12,22 @@ from collections import Counter, defaultdict
 from pathlib import Path
 from typing import Generator
 
-from nb_tokenizer import tokenize
-
-from poetry_analysis.utils import annotate, split_stanzas, strip_punctuation
+from poetry_analysis import utils
 
 
 def count_initial_phrases(text: str) -> Counter:
     """Count the number of times string-initial phrases of different lengths occur in a string."""
     phrase_counts = Counter()
-    alpanumeric_only = strip_punctuation(text)
-    words = tokenize(alpanumeric_only)
+
+    lowercase = text.strip().lower()
+    normalized_text = utils.strip_punctuation(lowercase)
+    words = utils.tokenize(normalized_text)
     n_words = len(words)
 
     for n in range(1, n_words + 1):
         if len(words) >= n:
             phrase = " ".join(words[:n])
-            count = text.count(phrase)
+            count = normalized_text.count(phrase)
             if count > 0:
                 phrase_counts[phrase] += count
     return phrase_counts
@@ -54,7 +54,7 @@ def find_longest_most_frequent_anaphora(phrases: Counter) -> tuple:
 def extract_line_anaphora(text: str) -> list:
     """Extract line initial word sequences that are repeated at least twice on the same line."""
     anaphora = []
-    lines = text.strip().lower().splitlines()
+    lines = text.strip().splitlines()
     for i, line in enumerate(lines):
         line_initial_phrases = count_initial_phrases(line)
         phrase, count = find_longest_most_frequent_anaphora(line_initial_phrases)
@@ -84,11 +84,44 @@ def filter_anaphora(stanza_anaphora: dict) -> Generator:
             yield annotation
 
 
+def extract_stanza_anaphora(stanza: list[str], n_words: int = 1) -> dict:
+    """Gather indeces for all lines that a line-initial word repeats across successively.
+
+    Args:
+        n_words: Number of words to expect in the anaphora, must be 1 or higher.
+            If higher, a single word that is repeated more often than a phrase of
+            n_words will be ignored in favour of the less frequent phrase.
+    """
+    stanza_anaphora = {}
+    lines = [utils.normalize(line) if line else list() for line in stanza]
+    for line_index, words in enumerate(lines):
+        if not words:
+            continue
+
+        first_phrase = " ".join(words[:n_words])
+        if line_index == 0:
+            stanza_anaphora[first_phrase] = [line_index]
+            continue
+
+        previous_line = lines[line_index - 1]
+        try:
+            previous_first_phrase = " ".join(previous_line[:n_words])
+        except IndexError:
+            previous_first_phrase = None
+
+        if line_index > 0 and previous_first_phrase == first_phrase:
+            stanza_anaphora[first_phrase].append(line_index)
+        else:
+            stanza_anaphora[first_phrase] = [line_index]
+
+    return stanza_anaphora
+
+
 def extract_poem_anaphora(text: str) -> list:
     """Extract line-initial word sequences that are repeated at least twice in each stanza."""
     anaphora = []
 
-    stanzas = split_stanzas(text)
+    stanzas = utils.split_stanzas(text)
     for i, stanza in enumerate(stanzas):
         stanza_anaphora = extract_stanza_anaphora(stanza)
 
@@ -99,31 +132,9 @@ def extract_poem_anaphora(text: str) -> list:
     return anaphora
 
 
-def extract_stanza_anaphora(stanza: list[str], n_words: int = 1) -> dict:
-    """Gather indeces for all lines that a line-initial word repeats across successively."""
-    stanza_anaphora = {}
-
-    for line_index, line in enumerate(stanza):
-        if not line:
-            continue
-        first_word = line.split()[n_words - 1].lower()
-        previous_line = stanza[line_index - 1].lower().split()
-        try:
-            previous_first_word = previous_line[n_words - 1]
-        except IndexError:
-            previous_first_word = None
-
-        if line_index > 0 and previous_first_word == first_word:
-            stanza_anaphora[first_word].append(line_index)
-        else:
-            stanza_anaphora[first_word] = [line_index]
-
-    return stanza_anaphora
-
-
 def detect_repeating_lines(text: str) -> list:
     """Detect repeating lines in a poem."""
-    stanzas = split_stanzas(text)
+    stanzas = utils.split_stanzas(text)
     lines = [line.strip() for stanza in stanzas for line in stanza]
 
     repeating_lines = {}
@@ -177,7 +188,7 @@ def extract_anaphora(text: str) -> dict:
     ngram_counts = defaultdict(lambda: defaultdict(int))
 
     for line in lines:
-        text = strip_punctuation(line)
+        text = utils.strip_punctuation(line)
         words = text.split()
         n_words = len(words)
         for n in range(1, n_words + 1):
@@ -212,9 +223,8 @@ if __name__ == "__main__":
     # Analyze the text
     filepath = Path(args.textfile)
     text = filepath.read_text()
+    annotations = extract_poem_anaphora(text)
 
     output_file = Path(filepath.parent / f"{filepath.stem}_anaphora.json")
-    annotate(
-        extract_anaphora, text, stanzaic=args.split_stanzas, outputfile=output_file
-    )
+    utils.save_annotations(annotations, output_file)
     print(f"Anaphora saved to file: {output_file}")

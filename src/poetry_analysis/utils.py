@@ -2,9 +2,10 @@ import json
 import re
 import string
 from pathlib import Path
-from typing import Generator
+from typing import Callable, Generator
 
 from convert_pa import convert_nofabet, nofabet_to_ipa
+from nb_tokenizer import tokenize
 
 PUNCTUATION_MARKS = str(
     string.punctuation + "‒.,!€«»’”—⁷⁶⁰–‒––!”-?‒"
@@ -92,8 +93,8 @@ def convert_to_syllables(phonemes: str | list, ipa: bool = False) -> list:
     """Turn a sequence of phonemes into syllable groups."""
     transcription = phonemes if isinstance(phonemes, str) else " ".join(phonemes)
     if ipa:
-        ipa = nofabet_to_ipa(transcription)
-        syllables = ipa.split(".")
+        ipa_str = nofabet_to_ipa(transcription)
+        syllables = ipa_str.split(".")
     else:
         nofabet_syllables = convert_nofabet.nofabet_to_syllables(transcription)
         syllables = [" ".join(syll) for syll in nofabet_syllables]
@@ -244,7 +245,7 @@ def format_transcription(pronunciation):
     return " ".join(pronunciation)
 
 
-def gather_stanza_annotations(func) -> callable:
+def gather_stanza_annotations(func) -> Callable:
     """Decorator to apply a function to each stanza in a text."""
 
     def wrapper(text: str) -> dict:
@@ -267,7 +268,17 @@ def split_stanzas(text: str) -> list:
     ]
 
 
-def annotate(func, text: str, stanzaic: bool = False, outputfile: str | Path = None):
+def normalize(text: str) -> list[str]:
+    """Lowercase, remove punctuation and tokenize a string of text."""
+    lowercase = text.strip().lower()
+    alpanumeric_only = strip_punctuation(lowercase)
+    words = tokenize(alpanumeric_only)
+    return words
+
+
+def annotate(
+    func, text: str, stanzaic: bool = False, outputfile: str | Path | None = None
+):
     if stanzaic:
         new_func = gather_stanza_annotations(func)
         annotations = new_func(text)
@@ -280,6 +291,17 @@ def annotate(func, text: str, stanzaic: bool = False, outputfile: str | Path = N
         print(f"Saved annotated data to {outputfile}")
     else:
         return annotations
+
+
+def save_annotations(annotations: dict | list, outputfile: str | Path | None = None):
+    if outputfile is None:
+        import time
+
+        outputfile = f"annotations_{int(time.time())}.json"
+
+    Path(outputfile).write_text(
+        json.dumps(annotations, indent=4, ensure_ascii=False), encoding="utf-8"
+    )
 
 
 if __name__ == "__main__":
