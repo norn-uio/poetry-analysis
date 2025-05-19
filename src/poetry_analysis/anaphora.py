@@ -12,13 +12,16 @@ from collections import Counter, defaultdict
 from pathlib import Path
 from typing import Generator
 
+from nb_tokenizer import tokenize
+
 from poetry_analysis.utils import annotate, split_stanzas, strip_punctuation
 
 
 def count_initial_phrases(text: str) -> Counter:
-    """Count the number of times initial phrases of different lengths occur in a string."""
+    """Count the number of times string-initial phrases of different lengths occur in a string."""
     phrase_counts = Counter()
-    words = strip_punctuation(text).split()
+    alpanumeric_only = strip_punctuation(text)
+    words = tokenize(alpanumeric_only)
     n_words = len(words)
 
     for n in range(1, n_words + 1):
@@ -31,7 +34,7 @@ def count_initial_phrases(text: str) -> Counter:
 
 
 def find_longest_most_frequent_anaphora(phrases: Counter) -> tuple:
-    """Find the longest and most repeated word sequence in a line."""
+    """Find the longest and most repeated word sequence in a counter."""
     if not phrases:
         return None, 0  # type: ignore
 
@@ -51,7 +54,7 @@ def find_longest_most_frequent_anaphora(phrases: Counter) -> tuple:
 def extract_line_anaphora(text: str) -> list:
     """Extract line initial word sequences that are repeated at least twice on the same line."""
     anaphora = []
-    lines = text.strip().lower().split("\n")
+    lines = text.strip().lower().splitlines()
     for i, line in enumerate(lines):
         line_initial_phrases = count_initial_phrases(line)
         phrase, count = find_longest_most_frequent_anaphora(line_initial_phrases)
@@ -167,7 +170,7 @@ def extract_anaphora(text: str) -> dict:
         }
     }
     """
-    lines = text.strip().lower().split("\n")
+    lines = text.strip().lower().splitlines()
     ngram_counts = defaultdict(lambda: defaultdict(int))
 
     for line in lines:
