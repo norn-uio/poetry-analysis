@@ -64,8 +64,24 @@ def extract_line_anaphora(text: str) -> list:
     return anaphora
 
 
-def is_successive(items: list):
+def is_successive(items: list[int]) -> list[bool]:
+    """Assert whether all numbers in a list are monotonic and incremental."""
     return [items[i] == items[i - 1] + 1 for i, item in enumerate(items)][1:]
+
+
+def filter_anaphora(stanza_anaphora: dict) -> Generator:
+    """Construct and yield an annotation dictionary
+    only for stanzas where anaphora are immediately successive."""
+    for phrase, indeces in stanza_anaphora.items():
+        if len(indeces) <= 1:
+            continue
+        if all(is_successive(indeces)):
+            annotation = {
+                "line_id": indeces,
+                "phrase": phrase,
+                "count": len(indeces),
+            }
+            yield annotation
 
 
 def extract_poem_anaphora(text: str) -> list:
@@ -103,19 +119,6 @@ def extract_stanza_anaphora(stanza: list[str], n_words: int = 1) -> dict:
             stanza_anaphora[first_word] = [line_index]
 
     return stanza_anaphora
-
-
-def filter_anaphora(stanza_anaphora: dict) -> Generator:
-    for phrase, indeces in stanza_anaphora.items():
-        if len(indeces) <= 1:
-            continue
-        if all(is_successive(indeces)):
-            annotation = {
-                "line_id": indeces,
-                "phrase": phrase,
-                "count": len(indeces),
-            }
-            yield annotation
 
 
 def detect_repeating_lines(text: str) -> list:
