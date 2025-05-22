@@ -18,8 +18,9 @@ from poetry_analysis import rhyme_detection as rd
     ],
 )
 def test_find_correct_orthographic_nucleus(word, expected):
-    result = rd.find_nucleus(word, orthographic=True).group(1)
-
+    nucleus = rd.find_nucleus(word, orthographic=True)
+    assert nucleus
+    result = nucleus.group(1)
     assert result == expected
 
 
@@ -35,6 +36,7 @@ def test_find_correct_orthographic_nucleus(word, expected):
     ],
 )
 def test_find_correct_phonemic_nucleus(word, expected):
-    result = rd.find_nucleus(word, orthographic=False).group(1)
-
+    nucleus = rd.find_nucleus(word, orthographic=False)
+    assert nucleus
+    result = nucleus.group(1)
     assert result == expected
