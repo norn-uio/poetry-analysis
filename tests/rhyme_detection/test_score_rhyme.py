@@ -75,16 +75,32 @@ def test_no_common_vowels_scores_zero(word1, word2):
     [
         ("sleden", "bilen"),
         ("husene", "byene"),
-        # ("spiste", "lyste"), # Can't handle this case yet
         ("gutane", "tankane"),
         ("fester", "blomster"),
         ("diktet", "brevet"),
         ("arbeidet", "jogget"),
+        ("spiste", "lyste"),
     ],
 )
 def test_common_grammatical_ending_scores_zero(word1, word2):
     result = rd.score_rhyme(word1, word2)
     assert result == 0.0
+
+
+@pytest.mark.parametrize(
+    "word1, word2",
+    [
+        ("drømme", "klype"),
+        ("synge", "klare"),
+        ("arbeide", "sile"),
+        ("tre", "be"),
+        ("ene", "kvinde"),
+        ("sparka", "kasta"),
+    ],
+)
+def test_final_schwa_scores_zero(word1, word2):
+    result = rd.score_rhyme(word1, word2)
+    assert result == 0
 
 
 @pytest.mark.parametrize(
