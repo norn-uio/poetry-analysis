@@ -1,11 +1,15 @@
 [project]
 name = "poetry-analysis"
-version = "0.3.7"
+version = "0.3.8"
 description = "Tool to parse, annotate and analyse Norwegian poetry."
 authors = [
     {name = "Ingerid Dale", email = "ingerid.dale@nb.no"},
 ]
-dependencies = ["nb-tokenizer>=0.1.0", "pandas>=2.2.3", "convert-pa>=0.1.0"]
+dependencies = [
+    "nb-tokenizer",
+    "pandas",
+    "convert-pa"
+]
 requires-python = ">=3.11"
 readme = "README.md"
 license = {text = "CC BY 4.0"}
@@ -15,19 +19,18 @@ Repository = "https://github.com/norn-uio/poetry-analysis.git"
 Issues = "https://github.com/norn-uio/poetry-analysis/issues"
 
 
-[build-system]
-requires = ["pdm-backend"]
-build-backend = "pdm.backend"
-
-
 [dependency-groups]
 dev = [
-    "pytest>=8.3.4",
-    "pytest-cov>=6.0.0",
-    "ruff>=0.9.4",
-    "ipykernel>=6.29.5",
-    "pre-commit>=4.2.0",
+    "pytest",
+    "pytest-cov",
+    "ruff",
+    "ipykernel",
+    "pre-commit",
 ]
+
+[build-system]
+requires = ["hatchling >= 1.26"]
+build-backend = "hatchling.build"
 
 
 [tool.pytest.ini_options]
