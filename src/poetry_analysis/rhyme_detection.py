@@ -14,13 +14,6 @@ from poetry_analysis import utils
 
 
 @dataclass
-class Poem:
-    _id: str
-    text: str
-    stanzas: list
-
-
-@dataclass
 class Verse:
     id_: str | int
     rhyme_score: int = 0
@@ -97,13 +90,6 @@ def remove_syllable_onset(syllable: list) -> list | None:
         if is_nucleus(phone):
             return syllable[idx:]
     logging.debug("No nucleus found in %s", syllable)
-
-
-def do_syll_seqs_rhyme(syll1: list, syll2: list) -> bool:
-    """Check  if each syllable in two syllable sequences are identical, apart from the stress marker."""
-    if all(strip_stress(s1) == strip_stress(s2) for s1, s2 in zip(syll1, syll2)):
-        return True
-    return False
 
 
 def score_rhyme(sequence1: str, sequence2: str, orthographic: bool = False) -> float:
@@ -185,7 +171,8 @@ def shared_ending_substring(string1: str, string2: str) -> str:
 
     for i in range(1, min_length + 1):
         if string1[-i] != string2[-i]:
-            return string1[-i + 1 :] if i > 1 else ""
+            final_substring = string1[-i + 1 :] if i > 1 else ""
+            return final_substring
     return string1[-min_length:] if min_length > 0 else ""
 
 
@@ -375,8 +362,8 @@ def main():
     parser = argparse.ArgumentParser(description="Tag rhyme schemes in a poem.")
     parser.add_argument(
         "-f",
-        "--jsonfile",
-        type=str,
+        "--poemfile",
+        type=Path,
         help="Path to a json file with phonemic transcriptions.",
     )
     parser.add_argument(
@@ -395,8 +382,8 @@ def main():
         logging_file = f"{__file__.split('.')[0]}_{today}.log"
         logging.basicConfig(level=logging.DEBUG, filename=logging_file, filemode="a")
 
-    if args.jsonfile:
-        tag_poem_file(args.jsonfile, write_to_file=True)
+    if args.poemfile:
+        tag_poem_file(args.poemfile, write_to_file=True)
 
     if args.doctest:
         import doctest
