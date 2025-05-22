@@ -84,6 +84,20 @@ def find_nucleus(word: str, orthographic: bool = False) -> re.Match | None:
     return nucleus
 
 
+def is_schwa(string: str) -> bool:
+    string = string.strip()
+    if (
+        (string == "a")
+        or (string == "e")
+        or (string == "AX")
+        or (string == "AX0")
+        or (string == "AH")
+        or (string == "AH0")
+    ):
+        return True
+    return False
+
+
 def remove_syllable_onset(syllable: list) -> list | None:
     """Split a syllable nucleus and coda from the onset to find the rhyming part of the syllable."""
     for idx, phone in enumerate(syllable):
@@ -122,6 +136,13 @@ def score_rhyme(sequence1: str, sequence2: str, orthographic: bool = False) -> f
             "the rhyming part is a grammatical suffix: %s", substring[nucleus.start() :]
         )
         # e.g. "blomster" / "fester"
+        return 0
+    if is_schwa(substring):
+        logging.debug(
+            "the rhyming part is scwha (%s) and the words share no other vowels: %s",
+            substring,
+            (sequence1, sequence2),
+        )
         return 0
 
     if not sequence1.endswith(substring) or not sequence2.endswith(substring):

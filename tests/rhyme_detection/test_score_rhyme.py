@@ -96,6 +96,7 @@ def test_common_grammatical_ending_scores_zero(word1, word2):
         ("tre", "be"),
         ("ene", "kvinde"),
         ("sparka", "kasta"),
+        ("SJ IH2 N NX0 AX0", "L AH2 N AX0"),
     ],
 )
 def test_final_schwa_scores_zero(word1, word2):
