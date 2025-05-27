@@ -86,14 +86,7 @@ def find_nucleus(word: str, orthographic: bool = False) -> re.Match | None:
 
 def is_schwa(string: str) -> bool:
     string = string.strip()
-    if (
-        (string == "a")
-        or (string == "e")
-        or (string == "AX")
-        or (string == "AX0")
-        or (string == "AH")
-        or (string == "AH0")
-    ):
+    if (string == "e") or (string == "AX") or (string == "AX0"):
         return True
     return False
 
