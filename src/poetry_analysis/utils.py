@@ -304,6 +304,31 @@ def save_annotations(annotations: dict | list, outputfile: str | Path | None = N
     )
 
 
+def group_consecutive_numbers(nums):
+    """Group consecutive numbers into sublists.
+
+    Example:
+        Input: [1, 2, 3, 5, 6, 8, 9, 10]
+        Output: [[1, 2, 3], [5, 6], [8, 9, 10]]
+    """
+    if not nums:
+        return []
+
+    nums = sorted(nums)
+    result = []
+    current_group = [nums[0]]
+
+    for i in range(1, len(nums)):
+        if nums[i] == nums[i - 1] + 1:
+            current_group.append(nums[i])
+        else:
+            result.append(current_group)
+            current_group = [nums[i]]
+
+    result.append(current_group)
+    return result
+
+
 if __name__ == "__main__":
     import doctest
 
