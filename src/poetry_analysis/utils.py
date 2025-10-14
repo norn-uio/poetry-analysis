@@ -289,7 +289,7 @@ def save_annotations(annotations: dict | list, outputfile: str | Path | None = N
     Path(outputfile).write_text(json.dumps(annotations, indent=4, ensure_ascii=False), encoding="utf-8")
 
 
-def group_consecutive_numbers(nums):
+def group_consecutive_numbers(nums: list[int]) -> list[list[int]]:
     """Group consecutive numbers into sublists.
 
     Examples:
