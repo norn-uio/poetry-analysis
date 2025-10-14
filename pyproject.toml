@@ -1,7 +1,7 @@
 [project]
 name = "poetry-analysis"
 version = "0.3.10"
-description = "Tool to parse, annotate and analyse Norwegian poetry."
+description = "Tool to parse and annotate Norwegian poetry."
 authors = [
     {name = "Ingerid Dale", email = "ingerid.dale@nb.no"},
 ]
