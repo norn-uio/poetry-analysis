@@ -73,6 +73,8 @@ show_error_codes = "True"
 [tool.ruff]
 line-length = 120
 fix = true
+
+[tool.ruff.lint]
 select = [
     # flake8-2020
     "YTT",
@@ -110,4 +112,11 @@ ignore = [
     "E501",
     # DoNotAssignLambda
     "E731",
+    # Use of `assert` detected
+    "S101",
+    # String contains ambiguous `–` (EN DASH)
+    "RUF001",
+    #Possible hardcoded password
+    "S105",
+    "S106",
 ]
