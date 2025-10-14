@@ -1,10 +1,10 @@
 import json
 import re
 import string
+from collections.abc import Callable, Generator
 from pathlib import Path
-from typing import Callable, Generator
 
-from convert_pa import convert_nofabet, nofabet_to_ipa
+from convert_pa import nofabet_to_ipa, nofabet_to_syllables
 from nb_tokenizer import tokenize
 
 PUNCTUATION_MARKS = str(
@@ -78,12 +78,9 @@ def strip_punctuation(string: str) -> str:
     return strip_redundant_whitespace(alphanumstr)
 
 
-def make_comparable_string(input: list | str) -> str:
+def make_comparable_string(item: list | str) -> str:
     """Convert a list of strings into a single comparable string."""
-    if isinstance(input, list):
-        string = " ".join(input)
-    else:
-        string = str(input)
+    string = " ".join(item) if isinstance(item, list) else str(item)
     string = strip_punctuation(string)
     string = re.sub(r"[0123]", "", string)  # remove stress markers
     return string.casefold()
@@ -96,7 +93,7 @@ def convert_to_syllables(phonemes: str | list, ipa: bool = False) -> list:
         ipa_str = nofabet_to_ipa(transcription)
         syllables = ipa_str.split(".")
     else:
-        nofabet_syllables = convert_nofabet.nofabet_to_syllables(transcription)
+        nofabet_syllables = nofabet_to_syllables(transcription)
         syllables = [" ".join(syll) for syll in nofabet_syllables]
     return syllables
 
@@ -216,20 +213,18 @@ def is_valid_onset(phonelist: str) -> bool:
     if len(phonelist) == 1 and phonelist in valid_single_consonants:
         return True
 
-    if phonelist in valid_clusters:
-        return True
-    return False
+    return phonelist in valid_clusters
 
 
 def annotate_transcriptions(transcription: list) -> Generator:
     for word, pronunciation in transcription:
         nofabet = format_transcription(pronunciation)
-        yield dict(
-            word=word,
-            nofabet=nofabet,
-            syllables=convert_nofabet.nofabet_to_syllables(nofabet),
-            ipa=nofabet_to_ipa(nofabet),
-        )
+        yield {
+            "word": word,
+            "nofabet": nofabet,
+            "syllables": nofabet_to_syllables(nofabet),
+            "ipa": nofabet_to_ipa(nofabet),
+        }
 
 
 def split_paragraphs(text: str) -> list:
@@ -261,11 +256,7 @@ def gather_stanza_annotations(func) -> Callable:
 
 def split_stanzas(text: str) -> list:
     """Split a poem into stanzas and stanzas into verses."""
-    return [
-        [verse.rstrip() for verse in stanza.rstrip().splitlines()]
-        for stanza in re.split("\n{2,}", text)
-        if stanza
-    ]
+    return [[verse.rstrip() for verse in stanza.rstrip().splitlines()] for stanza in re.split("\n{2,}", text) if stanza]
 
 
 def normalize(text: str) -> list[str]:
@@ -276,18 +267,14 @@ def normalize(text: str) -> list[str]:
     return words
 
 
-def annotate(
-    func, text: str, stanzaic: bool = False, outputfile: str | Path | None = None
-):
+def annotate(func, text: str, stanzaic: bool = False, outputfile: str | Path | None = None):
     if stanzaic:
         new_func = gather_stanza_annotations(func)
         annotations = new_func(text)
     else:
         annotations = func(text)
     if outputfile is not None:
-        Path(outputfile).write_text(
-            json.dumps(annotations, indent=4, ensure_ascii=False), encoding="utf-8"
-        )
+        Path(outputfile).write_text(json.dumps(annotations, indent=4, ensure_ascii=False), encoding="utf-8")
         print(f"Saved annotated data to {outputfile}")
     else:
         return annotations
@@ -299,9 +286,34 @@ def save_annotations(annotations: dict | list, outputfile: str | Path | None = N
 
         outputfile = f"annotations_{int(time.time())}.json"
 
-    Path(outputfile).write_text(
-        json.dumps(annotations, indent=4, ensure_ascii=False), encoding="utf-8"
-    )
+    Path(outputfile).write_text(json.dumps(annotations, indent=4, ensure_ascii=False), encoding="utf-8")
+
+
+def group_consecutive_numbers(nums: list[int]) -> list[list[int]]:
+    """Group consecutive numbers into sublists.
+
+    Examples:
+        >>> list_of_numbers = [1, 2, 3, 5, 6, 8, 9, 10]
+        >>> result = group_consecutive_numbers(list_of_numbers)
+        >>> print(result)
+        [[1, 2, 3], [5, 6], [8, 9, 10]]
+    """
+    if not nums:
+        return []
+
+    nums = sorted(nums)
+    result = []
+    current_group = [nums[0]]
+
+    for i in range(1, len(nums)):
+        if nums[i] == nums[i - 1] + 1:
+            current_group.append(nums[i])
+        else:
+            result.append(current_group)
+            current_group = [nums[i]]
+
+    result.append(current_group)
+    return result
 
 
 if __name__ == "__main__":

@@ -1,0 +1,66 @@
+name: Main
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  testing:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.11", "3.12", "3.13"]
+      fail-fast: false
+    steps:
+      - name: Check out
+        uses: actions/checkout@v5
+
+      - uses: actions/cache@v4
+        with:
+          path: ~/.cache/pre-commit
+          key: pre-commit-${{ hashFiles('.pre-commit-config.yaml') }}
+
+      - name: Setup PDM
+        uses: pdm-project/setup-pdm@v4
+        # You are now able to use PDM in your workflow
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Lock dependencies
+        run: pdm lock -d
+
+      - name: Install dependencies
+        run: |
+          pdm sync -d
+        shell: bash
+
+      - name: Run ruff and mypy
+        run: make check
+
+      - name: Test code with pytest
+        run: make test
+
+  check-docs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out
+        uses: actions/checkout@v5
+
+      - name: Setup PDM
+        uses: pdm-project/setup-pdm@v4
+        # You are now able to use PDM in your workflow
+        with:
+          python-version: 3.11
+
+      - name: Lock dependencies
+        run: pdm lock -d -G docs
+
+      - name: Install dependencies
+        run: pdm install
+        shell: bash
+
+      - name: Check if documentation can be built
+        run: pdm run mkdocs build -s

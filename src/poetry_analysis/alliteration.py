@@ -1,5 +1,5 @@
-"""Alliteration is the repetition of word-initial
-consonants or consonant clusters.
+"""The definition of alliteration that we use here is the repetition
+of word-initial consonants or consonant clusters.
 """
 
 from pathlib import Path
@@ -10,10 +10,10 @@ from poetry_analysis.utils import annotate
 def count_alliteration(text: str) -> dict:
     """Count the number of times the same word-initial letter occurs in a text.
 
-    Example use:
-    >>> text = "Sirius som seer"
-    >>> count_alliteration(text)
-    {'s': 3}
+    Examples:
+        >>> text = "Sirius som seer"
+        >>> count_alliteration(text)
+        {'s': 3}
     """
     words = text.split()
     initial_counts = {}
@@ -25,9 +25,7 @@ def count_alliteration(text: str) -> dict:
         else:
             initial_counts[initial_letter] = 1
 
-    alliteration_count = {
-        letter: count for letter, count in initial_counts.items() if count > 1
-    }
+    alliteration_count = {letter: count for letter, count in initial_counts.items() if count > 1}
 
     return alliteration_count
 
@@ -40,10 +38,10 @@ def extract_alliteration(text: list[str]) -> list[dict]:
     Args:
         text (list): A list of strings, where each string is a line of text.
 
-    Example use:
-    >>> text = ['Stjerneklare Septembernat Sees Sirius', 'Sydhimlens smukkeste Stjerne']
-    >>> extract_alliteration(text)
-    [{'line': 0, 'symbol': 's', 'count': 4, 'words': ['Stjerneklare', 'Septembernat', 'Sees', 'Sirius']}, {'line': 1, 'symbol': 's', 'count': 3, 'words': ['Sydhimlens', 'smukkeste', 'Stjerne']}]
+    Examples:
+        >>> text = ['Stjerneklare Septembernat Sees Sirius', 'Sydhimlens smukkeste Stjerne']
+        >>> extract_alliteration(text)
+        [{'line': 0, 'symbol': 's', 'count': 4, 'words': ['Stjerneklare', 'Septembernat', 'Sees', 'Sirius']}, {'line': 1, 'symbol': 's', 'count': 3, 'words': ['Sydhimlens', 'smukkeste', 'Stjerne']}]
     """
 
     alliterations = []
@@ -87,9 +85,7 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
     parser.add_argument("textfile", help="Filepath to the text to analyze.")
-    parser.add_argument(
-        "--split_stanzas", action="store_true", help="Split the text into stanzas."
-    )
+    parser.add_argument("--split_stanzas", action="store_true", help="Split the text into stanzas.")
     parser.add_argument(
         "-o",
         "--outputfile",

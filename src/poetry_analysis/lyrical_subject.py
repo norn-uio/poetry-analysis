@@ -1,11 +1,11 @@
 import re
 
-WORDBAGS = dict(
-    explicit_subject=[
+WORDBAGS = {
+    "explicit_subject": [
         "jeg",
         "eg",
     ],
-    explicit_object=[
+    "explicit_object": [
         "mig",
         "meg",
         "mine",
@@ -14,7 +14,7 @@ WORDBAGS = dict(
         "mit",
         "mi",
     ],
-    implicit=[
+    "implicit": [
         "vi",
         "oss",
         "våre",
@@ -28,7 +28,7 @@ WORDBAGS = dict(
         "dere",
         "deres",
     ],
-    deixis=[
+    "deixis": [
         "her",
         "hit",
         "nå",
@@ -39,23 +39,23 @@ WORDBAGS = dict(
         "i kveld",
         "i fjor",
     ],
-)
+}
 
-category_names = dict(
-    explicit_subject="Explicit subject)",
-    explicit_object="Explicit object",
-    implicit="Implicit",
-    deixis="Deixis",
-)
+category_names = {
+    "explicit_subject": "Explicit subject",
+    "explicit_object": "Explicit object",
+    "implicit": "Implicit",
+    "deixis": "Deixis",
+}
 
 
-def detect_lyrical_subject(poem_text: str):
+def detect_lyrical_subject(poem_text: str) -> dict:
     """Map the presence of certain words denoting a lyrical subject in a poem to categorical labels."""
     lyrical_subject = {}
     for label, words in WORDBAGS.items():
         regx_pattern = "|".join(words)
         matches = re.findall(regx_pattern, poem_text.lower())
-        is_present = True if any(matches) else False
+        is_present = bool(any(matches))
         lyrical_subject[label] = is_present
     return lyrical_subject
 

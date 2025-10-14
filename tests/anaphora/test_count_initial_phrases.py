@@ -21,7 +21,7 @@ def test_count_initial_phrases_returns_increasing_phrases_with_single_counts():
     assert all(count == 1 for count in result.values())
     assert all(
         actual_phrase == expected_phrase
-        for actual_phrase, expected_phrase in zip(result.keys(), expected.keys())
+        for actual_phrase, expected_phrase in zip(result.keys(), expected.keys(), strict=False)
     )
 
 

@@ -9,7 +9,7 @@ def previous_transcribed_lines(transcribed_poem_lines):
     last_tokens = ["S T OO1 D", "B OO3 D", "F UH2 L", "G UH2 L"]
     verselines = [
         rd.Verse(idx, tokens=words, last_token=last)
-        for idx, (words, last) in enumerate(zip(transcribed_poem_lines, last_tokens))
+        for idx, (words, last) in enumerate(zip(transcribed_poem_lines, last_tokens, strict=False))
     ]
     return verselines
 
@@ -17,8 +17,7 @@ def previous_transcribed_lines(transcribed_poem_lines):
 @pytest.fixture
 def previous_orthographic_lines(orthographic_poem_lines):
     verselines = [
-        rd.Verse(idx, tokens=words, last_token=words[-1])
-        for idx, words in enumerate(orthographic_poem_lines)
+        rd.Verse(idx, tokens=words, last_token=words[-1]) for idx, words in enumerate(orthographic_poem_lines)
     ]
     return verselines
 
@@ -58,14 +57,13 @@ def test_finds_rhyming_orthographic_line(
 ):
     # Given
     current_line = rd.Verse("X", last_token="tuld")
+    expected_last_token = "Guld"
 
     # When
-    verse, score = rd.find_rhyming_line(
-        current_line, previous_orthographic_lines, orthographic=True
-    )
+    verse, score = rd.find_rhyming_line(current_line, previous_orthographic_lines, orthographic=True)
 
     # Then
     # It will return the first rhyming match it finds, i.e. the last line
     assert verse == 3
     assert score == 1
-    assert previous_orthographic_lines[verse].last_token == "Guld"
+    assert previous_orthographic_lines[verse].last_token == expected_last_token
