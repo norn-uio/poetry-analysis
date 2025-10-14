@@ -50,6 +50,7 @@ coverage.xml
 .hypothesis/
 .pytest_cache/
 cover/
+.ruff_cache
 
 # Translations
 *.mo
@@ -141,6 +142,7 @@ venv.bak/
 
 # mkdocs documentation
 /site
+docs/source
 
 # mypy
 .mypy_cache/
@@ -163,4 +165,4 @@ cython_debug/
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
 .pypirc
-.vscode/settings.json
+.vscode
