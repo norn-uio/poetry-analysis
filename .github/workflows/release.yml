@@ -1,0 +1,61 @@
+name: release-main
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  release-build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out
+        uses: actions/checkout@v5
+
+      - name: Set up the environment
+        uses: ./.github/actions/setup-pdm-env
+
+      - name: Export tag
+        id: vars
+        run: echo tag=${GITHUB_REF#refs/*/} >> $GITHUB_OUTPUT
+
+      - name: Build release distros
+        run: |
+          source .venv/bin/activate
+          export PDM_BUILD_SCM_VERSION=$RELEASE_VERSION
+          make build
+
+      - name: upload windows dists
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-dists
+          path: dist/
+
+  pypi-publish:
+    runs-on: ubuntu-latest
+    needs:
+      - release-build
+    permissions:
+      id-token: write
+
+    steps:
+      - name: Retrieve release distributions
+        uses: actions/download-artifact@v5
+        with:
+          name: release-dists
+          path: dist/
+
+      - name: Publish release distributions to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+
+  deploy-docs:
+    needs: pypi-publish
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out
+        uses: actions/checkout@v5
+
+      - name: Set up the environment
+        uses: ./.github/actions/setup-pdm-env
+
+      - name: Deploy documentation
+        run: pdm run mkdocs gh-deploy --force
