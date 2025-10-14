@@ -19,9 +19,7 @@ def test_extract_stanza_anaphora_returns_dict_with_single_element_list():
     "phrase_length, phrase",
     [(1, "jeg"), (2, "jeg ser"), (3, "jeg ser på"), (4, "jeg ser på den")],
 )
-def test_extract_stanza_anaphora_returns_indices_of_all_occurrences(
-    phrase_length, phrase
-):
+def test_extract_stanza_anaphora_returns_indices_of_all_occurrences(phrase_length, phrase):
     text = [
         "jeg ser på den hvite himmel,\n",
         "jeg ser på den hvite himmel,\n",
@@ -30,7 +28,7 @@ def test_extract_stanza_anaphora_returns_indices_of_all_occurrences(
     ]
     result = extract_stanza_anaphora(text, n_words=phrase_length)
     assert len(result[phrase]) == len(text)
-    assert all(i == j for i, j in zip(result[phrase], range(len(text))))
+    assert all(i == j for i, j in zip(result[phrase], range(len(text)), strict=False))
 
 
 def test_extract_stanza_anaphora_skips_empty_line():
