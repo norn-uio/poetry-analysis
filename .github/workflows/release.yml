@@ -63,8 +63,17 @@ jobs:
       - name: Check out
         uses: actions/checkout@v5
 
-      - name: Set up the environment
-        uses: ./.github/actions/setup-pdm-env
+      - name: Setup PDM
+        uses: pdm-project/setup-pdm@v4
+        with:
+          python-version: 3.11
+
+      - name: Lock dependencies
+        run: pdm lock -d -G docs
+
+      - name: Install dependencies
+        run: pdm install
+        shell: bash
 
       - name: Deploy documentation
         run: pdm run mkdocs gh-deploy --force
