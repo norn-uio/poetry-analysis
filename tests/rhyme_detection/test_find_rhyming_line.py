@@ -57,6 +57,7 @@ def test_finds_rhyming_orthographic_line(
 ):
     # Given
     current_line = rd.Verse("X", last_token="tuld")
+    expected_last_token = "Guld"
 
     # When
     verse, score = rd.find_rhyming_line(current_line, previous_orthographic_lines, orthographic=True)
@@ -65,4 +66,4 @@ def test_finds_rhyming_orthographic_line(
     # It will return the first rhyming match it finds, i.e. the last line
     assert verse == 3
     assert score == 1
-    assert previous_orthographic_lines[verse].last_token == "Guld"
+    assert previous_orthographic_lines[verse].last_token == expected_last_token

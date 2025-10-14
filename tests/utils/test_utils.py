@@ -65,5 +65,5 @@ def test_split_orthographic_text_into_syllables():
     # when
     result = utils.split_orthographic_text_into_syllables(words)
     # then
-    for actual, syllables in zip(result, syllables, strict=False):
-        assert actual == syllables
+    for actual, sylls in zip(result, syllables, strict=False):
+        assert actual == sylls

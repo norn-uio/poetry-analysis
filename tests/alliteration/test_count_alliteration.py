@@ -5,13 +5,13 @@ def test_alliteration_returns_initial_consonant_counts():
     """Test that the function returns the count of word-initial consonants."""
     # Given
     text = """Stjerneklare Septembernat
-Sees Sirius, 
-Sydhimlens smukkeste 
-Stjerne, 
-Solens skjønneste Søster, 
-Svæve saa stille, 
-Straale saa smukt, 
-Skue sørgmodigt 
+Sees Sirius,
+Sydhimlens smukkeste
+Stjerne,
+Solens skjønneste Søster,
+Svæve saa stille,
+Straale saa smukt,
+Skue sørgmodigt
 Slægternes Strid.
 """
     expected = {"s": 20}

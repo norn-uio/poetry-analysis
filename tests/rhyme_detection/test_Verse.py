@@ -18,6 +18,6 @@ def test_verse_also_contains_unset_attributes():
     verse = rd.Verse(1)
     result = verse.dict
 
-    assert "text" in result.keys()
-    assert "rhyme_score" in result.keys()
+    assert "text" in result
+    assert "rhyme_score" in result
     assert result["last_token"] is None

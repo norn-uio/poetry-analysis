@@ -52,8 +52,6 @@ def test_extracting_only_first_elements_in_tuples(transcription_output):
 
 
 def test_extracting_second(transcription_output):
-    stanzas = rd.get_stanzas_from_transcription(
-        transcription_output, orthographic=False
-    )
+    stanzas = rd.get_stanzas_from_transcription(transcription_output, orthographic=False)
     verses = stanzas[0]
     assert all(obj == "line" for line in verses for obj in line)
