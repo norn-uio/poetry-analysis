@@ -23,14 +23,16 @@ jobs:
           path: ~/.cache/pre-commit
           key: pre-commit-${{ hashFiles('.pre-commit-config.yaml') }}
 
-      - name: Set up the environment
-        uses: ./.github/actions/setup-pdm-env
+      - name: Setup PDM
+        uses: pdm-project/setup-pdm@v4
+        # You are now able to use PDM in your workflow
         with:
           python-version: ${{ matrix.python-version }}
 
       - name: Install dependencies
         run: |
           pdm sync -d
+        shell: bash
 
       - name: Run ruff and mypy
         run: make check
