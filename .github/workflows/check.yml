@@ -19,8 +19,17 @@ jobs:
           path: ~/.cache/pre-commit
           key: pre-commit-${{ hashFiles('.pre-commit-config.yaml') }}
 
-      - name: Set up the environment
-        uses: ./.github/actions/setup-pdm-env
+      - name: Setup PDM
+        uses: pdm-project/setup-pdm@v4
+        # You are now able to use PDM in your workflow
+        with:
+          cache: true
+          cache-dependency-path: pylock.toml
+          update-python: true
+
+      - name: Install dependencies
+        run: pdm install
+        shell: bash
 
       - name: Run checks
         run: make check
@@ -43,7 +52,7 @@ jobs:
       - name: Install PDM
         uses: pdm-project/setup-pdm@v4
         with:
-          python-version: 3.11
+          python-version: ${{ matrix.python-version }}
           cache: true
 
       - name: Install dependencies
@@ -59,8 +68,8 @@ jobs:
         run: tox
 
       - name: Upload coverage reports to Codecov with GitHub Action on Python 3.11
-        uses: codecov/codecov-action@v3
-        if: ${{ matrix.python-version == '3.11' }}
+        uses: codecov/codecov-action@v5
+        if: ${{ matrix.python-version == '3.13' }}
 
   check-docs:
     runs-on: ubuntu-latest
@@ -68,8 +77,17 @@ jobs:
       - name: Check out
         uses: actions/checkout@v5
 
-      - name: Set up the environment
-        uses: ./.github/actions/setup-pdm-env
+      - name: Setup PDM
+        uses: pdm-project/setup-pdm@v4
+        # You are now able to use PDM in your workflow
+        with:
+          cache: true
+          cache-dependency-path: pylock.toml
+          python-version: 3.11
+
+      - name: Install dependencies
+        run: pdm install
+        shell: bash
 
       - name: Check if documentation can be built
         run: pdm run mkdocs build -s
