@@ -8,8 +8,8 @@ install: ## Install the environment and install the pre-commit hooks
 check: ## Run code quality tools.
 	@echo "🚀 Checking pdm lock file consistency with 'pyproject.toml': Running pdm lock --check"
 	@pdm lock --check
-	@echo "🚀 Linting code: Running pre-commit"
-	@pdm run pre-commit run -a
+	@echo "🚀 Linting code: Running ruff"
+	@pdm run ruff check
 	@echo "🚀 Static type checking: Running mypy"
 	@pdm run mypy
 

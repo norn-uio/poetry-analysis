@@ -18,6 +18,7 @@ runs:
         cache: true
         cache-dependency-path: pylock.toml
         update-python: true
+        python-version: 3.11
     - name: Install dependencies
       run: pdm install
       shell: bash

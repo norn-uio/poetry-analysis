@@ -34,8 +34,7 @@ dev = [
     "mypy",
     "ipykernel",
     "pre-commit",
-    "jupytext",
-    "tox",
+    "jupytext"
 ]
 
 [build-system]

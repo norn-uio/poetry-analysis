@@ -8,8 +8,12 @@ on:
     types: [opened, synchronize, reopened]
 
 jobs:
-  quality:
+  testing:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.11", "3.12", "3.13"]
+      fail-fast: false
     steps:
       - name: Check out
         uses: actions/checkout@v5
@@ -25,51 +29,18 @@ jobs:
         with:
           cache: true
           cache-dependency-path: pylock.toml
+          python-version: ${{ matrix.python-version }}
           update-python: true
 
       - name: Install dependencies
-        run: pdm install
-        shell: bash
+        run: |
+          pdm sync -d
 
-      - name: Run checks
+      - name: Run ruff and mypy
         run: make check
 
-  tox:
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version: ["3.11", "3.12", "3.13"]
-      fail-fast: false
-    steps:
-      - name: Check out
-        uses: actions/checkout@v5
-
-      - name: Set up python
-        uses: actions/setup-python@v4
-        with:
-          python-version: ${{ matrix.python-version }}
-
-      - name: Install PDM
-        uses: pdm-project/setup-pdm@v4
-        with:
-          python-version: ${{ matrix.python-version }}
-          cache: true
-
-      - name: Install dependencies
-        run: pdm install
-        shell: bash
-
-      - name: Install tox
-        run: |
-          python -m pip install --upgrade pip
-          python -m pip install tox tox-gh-actions
-
-      - name: Test with tox
-        run: tox
-
-      - name: Upload coverage reports to Codecov with GitHub Action on Python 3.11
-        uses: codecov/codecov-action@v5
-        if: ${{ matrix.python-version == '3.13' }}
+      - name: Test code with pytest
+        run: make test
 
   check-docs:
     runs-on: ubuntu-latest
@@ -86,8 +57,7 @@ jobs:
           python-version: 3.11
 
       - name: Install dependencies
-        run: pdm install
-        shell: bash
+        run: pdm sync -d -G docs
 
       - name: Check if documentation can be built
         run: pdm run mkdocs build -s
