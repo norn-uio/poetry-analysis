@@ -29,6 +29,9 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
+      - name: Lock dependencies
+        run: pdm lock
+
       - name: Install dependencies
         run: |
           pdm sync -d
@@ -46,11 +49,18 @@ jobs:
       - name: Check out
         uses: actions/checkout@v5
 
-      - name: Set up the environment
-        uses: ./.github/actions/setup-pdm-env
+      - name: Setup PDM
+        uses: pdm-project/setup-pdm@v4
+        # You are now able to use PDM in your workflow
+        with:
+          python-version: 3.11
+
+      - name: Lock dependencies
+        run: pdm lock
 
       - name: Install dependencies
         run: pdm sync -d -G docs
+        shell: bash
 
       - name: Check if documentation can be built
         run: pdm run mkdocs build -s
