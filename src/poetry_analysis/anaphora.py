@@ -9,8 +9,8 @@ We will continue with implementing a grading system for how effective the figure
 """
 
 from collections import Counter, defaultdict
+from collections.abc import Generator
 from pathlib import Path
-from typing import Generator
 
 from poetry_analysis import utils
 

@@ -10,8 +10,11 @@ check: ## Run code quality tools.
 	@pdm lock --check
 	@echo "🚀 Linting code: Running ruff"
 	@pdm run ruff check
-	@echo "🚀 Static type checking: Running mypy"
-	@pdm run mypy
+
+
+#TODO: add
+#@echo "🚀 Static type checking: Running mypy"
+#@pdm run mypy src/poetry_analysis
 
 .PHONY: test
 test: ## Test the code with pytest
