@@ -35,16 +35,15 @@ def count_initial_phrases(text: str) -> Counter:
 
 def find_longest_most_frequent_anaphora(phrases: Counter) -> tuple:
     """Find the longest and most repeated word sequence in a counter."""
-    if not phrases:
-        return None, 0  # type: ignore
+    if phrases:
+        _, highest_count = phrases.most_common()[0]
+        top_phrases = [phrase for phrase, _ in phrases.most_common() if phrases[phrase] == highest_count]
 
-    _, highest_count = phrases.most_common()[0]
-    top_phrases = [phrase for phrase, _ in phrases.most_common() if phrases[phrase] == highest_count]
+        longest_phrase = max(top_phrases, key=len)
+        longest_count = phrases[longest_phrase]
 
-    longest_phrase = max(top_phrases, key=len)
-    longest_count = phrases[longest_phrase]
-
-    return longest_phrase, longest_count
+        return longest_phrase, longest_count
+    return (None, 0)
 
 
 def extract_line_anaphora(text: str) -> list:
@@ -89,7 +88,8 @@ def extract_stanza_anaphora(stanza: list[str], n_words: int = 1) -> dict:
             n_words will be ignored in favour of the less frequent phrase.
     """
     stanza_anaphora = {}
-    lines = [utils.normalize(line) if line else list() for line in stanza]
+    empty_list = []
+    lines = [utils.normalize(line) if line else empty_list for line in stanza]
     for line_index, words in enumerate(lines):
         if not words:
             continue

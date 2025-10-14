@@ -78,12 +78,9 @@ def strip_punctuation(string: str) -> str:
     return strip_redundant_whitespace(alphanumstr)
 
 
-def make_comparable_string(input: list | str) -> str:
+def make_comparable_string(item: list | str) -> str:
     """Convert a list of strings into a single comparable string."""
-    if isinstance(input, list):
-        string = " ".join(input)
-    else:
-        string = str(input)
+    string = " ".join(item) if isinstance(item, list) else str(item)
     string = strip_punctuation(string)
     string = re.sub(r"[0123]", "", string)  # remove stress markers
     return string.casefold()
@@ -216,20 +213,18 @@ def is_valid_onset(phonelist: str) -> bool:
     if len(phonelist) == 1 and phonelist in valid_single_consonants:
         return True
 
-    if phonelist in valid_clusters:
-        return True
-    return False
+    return phonelist in valid_clusters
 
 
 def annotate_transcriptions(transcription: list) -> Generator:
     for word, pronunciation in transcription:
         nofabet = format_transcription(pronunciation)
-        yield dict(
-            word=word,
-            nofabet=nofabet,
-            syllables=nofabet_to_syllables(nofabet),
-            ipa=nofabet_to_ipa(nofabet),
-        )
+        yield {
+            "word": word,
+            "nofabet": nofabet,
+            "syllables": nofabet_to_syllables(nofabet),
+            "ipa": nofabet_to_ipa(nofabet),
+        }
 
 
 def split_paragraphs(text: str) -> list:

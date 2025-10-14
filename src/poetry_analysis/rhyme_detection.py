@@ -2,9 +2,9 @@ import json
 import logging
 import re
 import string
+from collections.abc import Generator
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Generator
 
 import numpy as np
 from convert_pa import phonetic_inventory
@@ -65,29 +65,31 @@ def strip_stress(phoneme: str) -> str:
 
 def is_nucleus(symbol: str, orthographic: bool = False) -> bool:
     """Check if a phoneme or a letter is a valid syllable nucleus."""
-    if orthographic:
-        valid_nuclei = utils.VALID_NUCLEI
-    else:
-        valid_nuclei = phonetic_inventory.PHONES_NOFABET["nuclei"]
+    valid_nuclei = get_valid_nuclei(orthographic=orthographic)
     return strip_stress(symbol) in valid_nuclei
+
+
+def get_valid_nuclei(orthographic: bool = False) -> list:
+    """Return the list of valid syllable nuclei with either graphemes or Nofabet phonemes.
+
+    Args:
+        orthographic: If True, return graphemes
+    """
+    return utils.VALID_NUCLEI if orthographic else phonetic_inventory.PHONES_NOFABET["nuclei"]
 
 
 def find_nucleus(word: str, orthographic: bool = False) -> re.Match | None:
     """Check if a word has a valid syllable nucleus."""
-    if orthographic:
-        valid_nuclei = utils.VALID_NUCLEI
-    else:
-        valid_nuclei = phonetic_inventory.PHONES_NOFABET["nuclei"]
+    valid_nuclei = get_valid_nuclei(orthographic=orthographic)
     rgx = re.compile(rf"({'|'.join(valid_nuclei)})")
     nucleus = rgx.search(word)
     return nucleus
 
 
 def is_schwa(string: str) -> bool:
+    """Check if a string object is the schwa sound."""
     string = string.strip()
-    if (string == "e") or (string == "AX") or (string == "AX0"):
-        return True
-    return False
+    return (string == "e") or (string == "AX") or (string == "AX0")
 
 
 def remove_syllable_onset(syllable: list) -> list | None:
@@ -138,7 +140,7 @@ def score_rhyme(sequence1: str, sequence2: str, orthographic: bool = False) -> f
         # not an end rhyme
         logging.debug("not an end rhyme: %s and %s", sequence1, sequence2)
         return 0
-    if substring == sequence1 or substring == sequence2:
+    if substring in (sequence1, sequence2):
         # one of the words is fully contained in the other
         logging.debug("Nødrim: %s and %s", sequence1, sequence2)
         return 0.5
@@ -324,9 +326,6 @@ def tag_poem_file(poem_file: str, write_to_file: bool = False) -> list:
     # and that the rhyme scheme is unique to each stanza
 
     filepath = Path(poem_file)
-
-    if not filepath.exists():
-        raise FileNotFoundError(f"File {filepath} does not exist.")
     file_content = filepath.read_text(encoding="utf-8")
     if filepath.suffix == ".json":
         poem = json.loads(file_content)
