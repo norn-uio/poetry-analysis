@@ -7,8 +7,7 @@ from pathlib import Path
 from typing import Generator
 
 import numpy as np
-from convert_pa import convert_nofabet
-from nb_tokenizer import tokenize
+from convert_pa import phonetic_inventory
 
 from poetry_analysis import utils
 
@@ -38,12 +37,12 @@ def is_stressed(syllable: str | list) -> bool:
     """Check if a syllable is stressed by searching for stress markers.
 
     Stress markers:
-        0 - Vowel/syllable nucleus without stress
-        1 - Primary stress with toneme 1
-        2 - Primary stress with toneme 2
-        3 - Secondary stress
+        - `0`: Vowel/syllable nucleus without stress
+        - `1`: Primary stress with toneme 1
+        - `2`: Primary stress with toneme 2
+        - `3`: Secondary stress
 
-    Example:
+    Examples:
         >>> is_stressed("a1")
         True
         >>> is_stressed("a0")
@@ -69,7 +68,7 @@ def is_nucleus(symbol: str, orthographic: bool = False) -> bool:
     if orthographic:
         valid_nuclei = utils.VALID_NUCLEI
     else:
-        valid_nuclei = convert_nofabet.PHONES_NOFABET["nuclei"]
+        valid_nuclei = phonetic_inventory.PHONES_NOFABET["nuclei"]
     return strip_stress(symbol) in valid_nuclei
 
 
@@ -78,7 +77,7 @@ def find_nucleus(word: str, orthographic: bool = False) -> re.Match | None:
     if orthographic:
         valid_nuclei = utils.VALID_NUCLEI
     else:
-        valid_nuclei = convert_nofabet.PHONES_NOFABET["nuclei"]
+        valid_nuclei = phonetic_inventory.PHONES_NOFABET["nuclei"]
     rgx = re.compile(rf"({'|'.join(valid_nuclei)})")
     nucleus = rgx.search(word)
     return nucleus
@@ -102,17 +101,16 @@ def remove_syllable_onset(syllable: list) -> list | None:
 def score_rhyme(sequence1: str, sequence2: str, orthographic: bool = False) -> float:
     """Check if two words rhyme and return a rhyming score.
 
-    1:      Only the syllable nucleus + coda (=rhyme) match # perfect or proper rhyme
-    0.5:    NØDRIM or lame rhyme. One of the words is fully contained in the other, e.g. 'tusenfryd' / 'fryd'
-    0:      No match
+    Returns:
+        `1.0`:    Only the syllable nucleus + coda (=rhyme) match # perfect or proper rhyme
+        `0.5`:    NØDRIM or lame rhyme. One of the words is fully contained in the other, e.g. 'tusenfryd' / 'fryd'
+        `0.0`:    No match
     """
 
     substring = shared_ending_substring(sequence1, sequence2)
 
     if not substring:
-        logging.debug(
-            "No shared ending substring found in %s and %s", sequence1, sequence2
-        )
+        logging.debug("No shared ending substring found in %s and %s", sequence1, sequence2)
         return 0
 
     nucleus = find_nucleus(substring, orthographic=orthographic)
@@ -125,9 +123,7 @@ def score_rhyme(sequence1: str, sequence2: str, orthographic: bool = False) -> f
         # e.g. "arbeidet" / "skrevet"
         return 0
     if utils.is_grammatical_suffix(substring[nucleus.start() :]):
-        logging.debug(
-            "the rhyming part is a grammatical suffix: %s", substring[nucleus.start() :]
-        )
+        logging.debug("the rhyming part is a grammatical suffix: %s", substring[nucleus.start() :])
         # e.g. "blomster" / "fester"
         return 0
     if is_schwa(substring):
@@ -208,17 +204,13 @@ def find_last_word(tokens: list[str]) -> str:
     return ""
 
 
-def find_rhyming_line(
-    current: Verse, previous_lines: list[Verse], orthographic: bool = False
-) -> tuple:
+def find_rhyming_line(current: Verse, previous_lines: list[Verse], orthographic: bool = False) -> tuple:
     """Check if the current line rhymes with any of the previous lines."""
 
     for idx, previous in reversed(list(enumerate(previous_lines))):
         if previous.last_token is None or current.last_token is None:
             continue
-        rhyme_score = score_rhyme(
-            previous.last_token, current.last_token, orthographic=orthographic
-        )
+        rhyme_score = score_rhyme(previous.last_token, current.last_token, orthographic=orthographic)
         if rhyme_score > 0:
             return idx, rhyme_score
     return None, 0
@@ -265,9 +257,7 @@ def tag_rhyming_verses(verses: list, orthographic: bool = False) -> list:
                 last_token=re.sub(r"[0123]", "", last_syllable),
             )
 
-        rhyming_idx, rhyme_score = find_rhyming_line(
-            current_verse, processed, orthographic=orthographic
-        )
+        rhyming_idx, rhyme_score = find_rhyming_line(current_verse, processed, orthographic=orthographic)
 
         if rhyming_idx is not None and rhyme_score > 0:
             rhyming_verse = processed[rhyming_idx]
@@ -279,9 +269,7 @@ def tag_rhyming_verses(verses: list, orthographic: bool = False) -> list:
             try:
                 current_verse.rhyme_tag = next(alphabet)
             except StopIteration:
-                logging.info(
-                    "Ran out of rhyme tags at %s! Initialising new alphabet.", idx
-                )
+                logging.info("Ran out of rhyme tags at %s! Initialising new alphabet.", idx)
                 alphabet = iter(string.ascii_letters)
                 current_verse.rhyme_tag = next(alphabet)
 
@@ -294,11 +282,9 @@ def collate_rhyme_scheme(annotated_stanza: list) -> str:
     return "".join(verse.rhyme_tag for verse in annotated_stanza)
 
 
-def get_stanzas_from_transcription(
-    transcription: dict, orthographic: bool = False
-) -> list:
+def get_stanzas_from_transcription(transcription: dict, orthographic: bool = False) -> list:
     """Parse a dict of transcribed verse lines and return a list of stanzas."""
-    line_ids = [x for x in transcription.keys() if x.startswith("line_")]
+    line_ids = [x for x in transcription if x.startswith("line_")]
     n_lines = len(line_ids)
     logging.debug("Number of lines in poem: %s", n_lines)
     poem = []
@@ -306,7 +292,7 @@ def get_stanzas_from_transcription(
     for line_n in line_ids:
         verse = transcription.get(line_n)
         if (verse is not None) and (len(verse) > 0):
-            words, pron = zip(*verse)
+            words, pron = zip(*verse, strict=False)
             verseline = list(words if orthographic else pron)
             stanza.append(verseline)
         else:
@@ -362,9 +348,7 @@ def tag_poem_file(poem_file: str, write_to_file: bool = False) -> list:
         with outputfile.open("w") as f:
             f.write(json.dumps(file_annotations, ensure_ascii=False, indent=4))
 
-        logging.debug(
-            "Saved rhyme scheme annotations for poem %s to \n\t%s", poem_id, outputfile
-        )
+        logging.debug("Saved rhyme scheme annotations for poem %s to \n\t%s", poem_id, outputfile)
     return file_annotations
 
 
@@ -386,9 +370,7 @@ def main():
         action="store_true",
         help="Run doctests in the module.",
     )
-    parser.add_argument(
-        "-v", "--verbose", action="store_true", help="Set logging level to debug."
-    )
+    parser.add_argument("-v", "--verbose", action="store_true", help="Set logging level to debug.")
     args = parser.parse_args()
 
     if args.verbose:

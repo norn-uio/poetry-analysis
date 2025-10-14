@@ -16,7 +16,7 @@ check: ## Run code quality tools.
 .PHONY: test
 test: ## Test the code with pytest
 	@echo "🚀 Testing code: Running pytest"
-	@pdm run pytest --cov --cov-config=pyproject.toml --cov-report=term-missing
+	@pdm run pytest
 
 .PHONY: build
 build: clean-build ## Build wheel file
@@ -33,6 +33,7 @@ docs-test: ## Test if documentation can be built without warnings or errors
 
 .PHONY: docs
 docs: ## Build and serve the documentation
+	@cp README.md docs/index.md
 	@pdm run mkdocs serve
 
 .PHONY: help

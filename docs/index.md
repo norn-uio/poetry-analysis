@@ -14,7 +14,7 @@ Lyric features that can be extracted with this tool includes
 - end rhyme schemes
 - alliteration
 - anaphora
-- lyric subject
+- lyrical subject
 
 This tool was developed for the [NORN project](https://www.hf.uio.no/iln/english/research/projects/norn-norwegian-romantic-nationalisms/index.html).
 

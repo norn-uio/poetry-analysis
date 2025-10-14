@@ -39,11 +39,7 @@ def find_longest_most_frequent_anaphora(phrases: Counter) -> tuple:
         return None, 0  # type: ignore
 
     _, highest_count = phrases.most_common()[0]
-    top_phrases = [
-        phrase
-        for phrase, _ in phrases.most_common()
-        if phrases[phrase] == highest_count
-    ]
+    top_phrases = [phrase for phrase, _ in phrases.most_common() if phrases[phrase] == highest_count]
 
     longest_phrase = max(top_phrases, key=len)
     longest_count = phrases[longest_phrase]
@@ -152,37 +148,37 @@ def detect_repeating_lines(text: str) -> list:
 def extract_anaphora(text: str) -> dict:
     """Extract line-initial word sequences that are repeated at least twice.
 
-    Example use:
-    >>> import json
-    >>> text = '''
-    ... Jeg ser paa den hvide himmel,
-    ... jeg ser paa de graablaa skyer,
-    ... jeg ser paa den blodige sol.
-    ...
-    ... Dette er altsaa verden.
-    ... Dette er altsaa klodernes hjem.
-    ...
-    ... En regndraabe!
-    ... '''
-    >>> result = extract_anaphora(text)
-    >>> print(json.dumps(result, indent=4))
-    {
-        "1-grams": {
-            "jeg": 3,
-            "dette": 2
-        },
-        "2-grams": {
-            "jeg ser": 3,
-            "dette er": 2
-        },
-        "3-grams": {
-            "jeg ser paa": 3,
-            "dette er altsaa": 2
-        },
-        "4-grams": {
-            "jeg ser paa den": 2
+    Examples:
+        >>> import json
+        >>> text = '''
+        ... Jeg ser paa den hvide himmel,
+        ... jeg ser paa de graablaa skyer,
+        ... jeg ser paa den blodige sol.
+        ...
+        ... Dette er altsaa verden.
+        ... Dette er altsaa klodernes hjem.
+        ...
+        ... En regndraabe!
+        ... '''
+        >>> result = extract_anaphora(text)
+        >>> print(json.dumps(result, indent=4))
+        {
+            "1-grams": {
+                "jeg": 3,
+                "dette": 2
+            },
+            "2-grams": {
+                "jeg ser": 3,
+                "dette er": 2
+            },
+            "3-grams": {
+                "jeg ser paa": 3,
+                "dette er altsaa": 2
+            },
+            "4-grams": {
+                "jeg ser paa den": 2
+            }
         }
-    }
     """
     lines = text.strip().lower().splitlines()
     ngram_counts = defaultdict(lambda: defaultdict(int))
@@ -215,9 +211,7 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
     parser.add_argument("textfile", help="Filepath to the text to analyze.")
-    parser.add_argument(
-        "--split_stanzas", action="store_true", help="Split the text into stanzas."
-    )
+    parser.add_argument("--split_stanzas", action="store_true", help="Split the text into stanzas.")
     args = parser.parse_args()
 
     # Analyze the text

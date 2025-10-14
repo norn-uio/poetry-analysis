@@ -9,10 +9,24 @@ copyright: Maintained by <a href="https://www.nb.no/dh-lab/">DH-laben</a> at the
 
 nav:
   - Home: index.md
-  - Modules: modules.md
+  - API reference:
+    - Alliteration: api_alliteration.md
+    - Anaphora: api_anaphora.md
+    - End rhymes: api_end_rhymes.md
+    - Lyric subject: api_lyrical_subject.md
+    - Utility functions: api_utils.md
   - 'Issue Tracker': 'https://github.com/norn-uio/poetry-analysis/issues/'
 plugins:
   - search
+  - mkdocstrings:
+      enabled: true
+      default_handler: python
+      handlers:
+        python:
+          options:
+            docstring_style: google
+            show_root_heading: true
+            show_source: true
 
 theme:
   name: material

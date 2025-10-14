@@ -4,7 +4,7 @@ import string
 from pathlib import Path
 from typing import Callable, Generator
 
-from convert_pa import convert_nofabet, nofabet_to_ipa
+from convert_pa import nofabet_to_ipa, nofabet_to_syllables
 from nb_tokenizer import tokenize
 
 PUNCTUATION_MARKS = str(
@@ -96,7 +96,7 @@ def convert_to_syllables(phonemes: str | list, ipa: bool = False) -> list:
         ipa_str = nofabet_to_ipa(transcription)
         syllables = ipa_str.split(".")
     else:
-        nofabet_syllables = convert_nofabet.nofabet_to_syllables(transcription)
+        nofabet_syllables = nofabet_to_syllables(transcription)
         syllables = [" ".join(syll) for syll in nofabet_syllables]
     return syllables
 
@@ -227,7 +227,7 @@ def annotate_transcriptions(transcription: list) -> Generator:
         yield dict(
             word=word,
             nofabet=nofabet,
-            syllables=convert_nofabet.nofabet_to_syllables(nofabet),
+            syllables=nofabet_to_syllables(nofabet),
             ipa=nofabet_to_ipa(nofabet),
         )
 
@@ -261,11 +261,7 @@ def gather_stanza_annotations(func) -> Callable:
 
 def split_stanzas(text: str) -> list:
     """Split a poem into stanzas and stanzas into verses."""
-    return [
-        [verse.rstrip() for verse in stanza.rstrip().splitlines()]
-        for stanza in re.split("\n{2,}", text)
-        if stanza
-    ]
+    return [[verse.rstrip() for verse in stanza.rstrip().splitlines()] for stanza in re.split("\n{2,}", text) if stanza]
 
 
 def normalize(text: str) -> list[str]:
@@ -276,18 +272,14 @@ def normalize(text: str) -> list[str]:
     return words
 
 
-def annotate(
-    func, text: str, stanzaic: bool = False, outputfile: str | Path | None = None
-):
+def annotate(func, text: str, stanzaic: bool = False, outputfile: str | Path | None = None):
     if stanzaic:
         new_func = gather_stanza_annotations(func)
         annotations = new_func(text)
     else:
         annotations = func(text)
     if outputfile is not None:
-        Path(outputfile).write_text(
-            json.dumps(annotations, indent=4, ensure_ascii=False), encoding="utf-8"
-        )
+        Path(outputfile).write_text(json.dumps(annotations, indent=4, ensure_ascii=False), encoding="utf-8")
         print(f"Saved annotated data to {outputfile}")
     else:
         return annotations
@@ -299,17 +291,17 @@ def save_annotations(annotations: dict | list, outputfile: str | Path | None = N
 
         outputfile = f"annotations_{int(time.time())}.json"
 
-    Path(outputfile).write_text(
-        json.dumps(annotations, indent=4, ensure_ascii=False), encoding="utf-8"
-    )
+    Path(outputfile).write_text(json.dumps(annotations, indent=4, ensure_ascii=False), encoding="utf-8")
 
 
 def group_consecutive_numbers(nums):
     """Group consecutive numbers into sublists.
 
-    Example:
-        Input: [1, 2, 3, 5, 6, 8, 9, 10]
-        Output: [[1, 2, 3], [5, 6], [8, 9, 10]]
+    Examples:
+        >>> list_of_numbers = [1, 2, 3, 5, 6, 8, 9, 10]
+        >>> result = group_consecutive_numbers(list_of_numbers)
+        >>> print(result)
+        [[1, 2, 3], [5, 6], [8, 9, 10]]
     """
     if not nums:
         return []

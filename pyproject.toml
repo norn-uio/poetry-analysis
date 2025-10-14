@@ -30,7 +30,6 @@ docs = [
 [dependency-groups]
 dev = [
     "pytest",
-    "pytest-cov",
     "ruff",
     "mypy",
     "ipykernel",
@@ -51,7 +50,7 @@ distribution = true
 source = "scm"
 
 [tool.pytest.ini_options]
-addopts = "--doctest-modules --cov=src --cov-report=term-missing"
+addopts = "--doctest-modules"
 
 [tool.coverage.report]
 skip_empty = true
