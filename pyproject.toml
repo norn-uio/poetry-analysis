@@ -26,12 +26,14 @@ dev = [
     "ruff",
     "ipykernel",
     "pre-commit",
+    "pip>=25.2",
+    "pytest-markdown>=0.0.7",
+    "jupytext>=1.17.3",
 ]
 
 [build-system]
-requires = ["hatchling >= 1.26"]
-build-backend = "hatchling.build"
-
+requires = ["pdm-backend"]
+build-backend = "pdm.backend"
 
 [tool.pytest.ini_options]
 addopts = "--doctest-modules --cov=src --cov-report=term-missing"
