@@ -23,14 +23,10 @@ jobs:
           path: ~/.cache/pre-commit
           key: pre-commit-${{ hashFiles('.pre-commit-config.yaml') }}
 
-      - name: Setup PDM
-        uses: pdm-project/setup-pdm@v4
-        # You are now able to use PDM in your workflow
+      - name: Set up the environment
+        uses: ./.github/actions/setup-pdm-env
         with:
-          cache: true
-          cache-dependency-path: pylock.toml
           python-version: ${{ matrix.python-version }}
-          update-python: true
 
       - name: Install dependencies
         run: |
@@ -48,13 +44,8 @@ jobs:
       - name: Check out
         uses: actions/checkout@v5
 
-      - name: Setup PDM
-        uses: pdm-project/setup-pdm@v4
-        # You are now able to use PDM in your workflow
-        with:
-          cache: true
-          cache-dependency-path: pylock.toml
-          python-version: 3.11
+      - name: Set up the environment
+        uses: ./.github/actions/setup-pdm-env
 
       - name: Install dependencies
         run: pdm sync -d -G docs

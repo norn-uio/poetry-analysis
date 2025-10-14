@@ -16,9 +16,7 @@ runs:
       # You are now able to use PDM in your workflow
       with:
         cache: true
-        cache-dependency-path: pylock.toml
         update-python: true
-        python-version: 3.11
+        python-version: ${{ inputs.python-version }}
     - name: Install dependencies
       run: pdm install
-      shell: bash
