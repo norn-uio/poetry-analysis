@@ -30,7 +30,7 @@ jobs:
           python-version: ${{ matrix.python-version }}
 
       - name: Lock dependencies
-        run: pdm lock
+        run: pdm lock -d
 
       - name: Install dependencies
         run: |
@@ -56,10 +56,10 @@ jobs:
           python-version: 3.11
 
       - name: Lock dependencies
-        run: pdm lock
+        run: pdm lock -d -G docs
 
       - name: Install dependencies
-        run: pdm sync -d -G docs
+        run: pdm install
         shell: bash
 
       - name: Check if documentation can be built
