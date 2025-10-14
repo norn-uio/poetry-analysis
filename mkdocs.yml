@@ -1,0 +1,50 @@
+site_name: poetry_analysis
+repo_url: https://github.com/norn-uio/poetry-analysis.git
+site_url: https://norn-uio.github.io/poetry-analysis
+site_description: Tool to parse and annotate Norwegian poetry.
+site_author: Ingerid Dale
+edit_uri: edit/main/docs/
+repo_name: norn-uio/poetry-analysis
+copyright: Maintained by <a href="https://www.nb.no/dh-lab/">DH-laben</a> at the National Library of Norway.
+
+nav:
+  - Home: index.md
+  - Modules: modules.md
+  - 'Issue Tracker': 'https://github.com/norn-uio/poetry-analysis/issues/'
+plugins:
+  - search
+
+theme:
+  name: material
+  feature:
+    tabs: true
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: white
+      accent: deep orange
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: black
+      accent: deep orange
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  icon:
+    repo: fontawesome/brands/github
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/norn-uio/poetry-analysis
+    - icon: fontawesome/brands/python
+      link: https://pypi.org/project/poetry-analysis
+
+markdown_extensions:
+  - toc:
+      permalink: true
+  - pymdownx.arithmatex:
+      generic: true
