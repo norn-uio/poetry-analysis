@@ -17,6 +17,7 @@ license = {text = "CC-BY-4.0"}
 [project.urls]
 Repository = "https://github.com/norn-uio/poetry-analysis.git"
 Issues = "https://github.com/norn-uio/poetry-analysis/issues"
+Documentation = "https://norn-uio.github.io/poetry-analysis/"
 
 [project.optional-dependencies]
 docs = [
