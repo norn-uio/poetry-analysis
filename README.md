@@ -21,7 +21,7 @@ This tool was developed for the [NORN project](https://www.hf.uio.no/iln/english
 It was developed alongside [NORN Poems](https://github.com/norn-uio/norn-poems), a corpus of Norwegian poetry from the 1890's, which is freely available as TEI `.xml` and plain `.txt` files.
 
 - **Github repository**: <https://github.com/norn-uio/poetry-analysis/>
-<!--  - **Documentation** <https://norn-uio.github.io/poetry-analysis/> -->
+- **Documentation** <https://norn-uio.github.io/poetry-analysis/>
 
 ## Installation
 
