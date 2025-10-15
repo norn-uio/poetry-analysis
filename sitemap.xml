@@ -2,26 +2,26 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
          <loc>https://norn-uio.github.io/poetry-analysis/</loc>
-         <lastmod>2025-10-14</lastmod>
+         <lastmod>2025-10-15</lastmod>
     </url>
     <url>
          <loc>https://norn-uio.github.io/poetry-analysis/api_alliteration/</loc>
-         <lastmod>2025-10-14</lastmod>
+         <lastmod>2025-10-15</lastmod>
     </url>
     <url>
          <loc>https://norn-uio.github.io/poetry-analysis/api_anaphora/</loc>
-         <lastmod>2025-10-14</lastmod>
+         <lastmod>2025-10-15</lastmod>
     </url>
     <url>
          <loc>https://norn-uio.github.io/poetry-analysis/api_end_rhymes/</loc>
-         <lastmod>2025-10-14</lastmod>
+         <lastmod>2025-10-15</lastmod>
     </url>
     <url>
          <loc>https://norn-uio.github.io/poetry-analysis/api_lyrical_subject/</loc>
-         <lastmod>2025-10-14</lastmod>
+         <lastmod>2025-10-15</lastmod>
     </url>
     <url>
          <loc>https://norn-uio.github.io/poetry-analysis/api_utils/</loc>
-         <lastmod>2025-10-14</lastmod>
+         <lastmod>2025-10-15</lastmod>
     </url>
 </urlset>
