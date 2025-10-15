@@ -62,7 +62,10 @@ def orthographic_poem_lines():
 
 @pytest.fixture
 def example_poem_landsmaal():
-    """Poem ID: 2873_Arne_Garborg_no-nb_digibok_2014073108102"""
+    """Poem ID: 2873
+    Author: Arne Garborg
+    URN: no-nb_digibok_2014073108102
+    """
     return """Kvass som kniv
 i daudkjøt flengjande.
 Sanningstyrst

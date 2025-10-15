@@ -320,6 +320,13 @@ def tag_stanzas(stanzas: list, orthographic: bool = False) -> Generator:
         }
 
 
+def tag_text(text: str) -> Generator:
+    """Annotate rhyming schemes in a text where stanzas are separated by two empty lines."""
+    stanzas = utils.split_stanzas(text)
+    file_annotations = tag_stanzas(stanzas, orthographic=True)
+    return file_annotations
+
+
 def tag_poem_file(poem_file: str, write_to_file: bool = False) -> list:
     """Annotate rhyming schemes in a poem from a file."""
     # Assume that the stanzas are independent of each other
