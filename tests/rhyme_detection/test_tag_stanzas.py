@@ -1,4 +1,4 @@
-from poetry_analysis.rhyme_detection import Verse, tag_stanzas
+from poetry_analysis.rhyme_detection import tag_stanzas
 
 
 def test_tag_stanzas_orthographic_simple():
