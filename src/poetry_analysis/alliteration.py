@@ -116,7 +116,7 @@ def group_alliterating_indices(indices: list, all_words_in_line: list, stop_word
     return result_groups
 
 
-def find_line_alliterations(text: str, allowed_intervening_words: list) -> list:  # noqa: C901
+def find_line_alliterations(text: str, allowed_intervening_words: list | None = None) -> list:  # noqa: C901
     """Find alliterating words on a line.
 
     Args:
