@@ -159,8 +159,6 @@ def find_line_alliterations(text: str | list, allowed_intervening_words: list | 
         words = text
     elif isinstance(text, str):
         words = utils.normalize(text)
-    elif text is None:
-        words = list()
 
     # Stores {initial_letter: [indices_of_words_starting_with_this_letter]}
     seen = {}
