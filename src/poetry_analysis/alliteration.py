@@ -108,9 +108,6 @@ if __name__ == "__main__":
     )
 
 
-from poetry_analysis import alliteration, utils
-
-
 # New helper function to group indices considering stop words
 def group_alliterating_indices(indices: list, all_words_in_line: list, stop_words: list):
     """
