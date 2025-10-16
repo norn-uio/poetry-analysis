@@ -4,7 +4,7 @@ of word-initial consonants or consonant clusters.
 
 from pathlib import Path
 
-from poetry_analysis.utils import annotate
+from poetry_analysis.utils import annotate, normalize
 
 
 def count_alliteration(text: str) -> dict:
@@ -74,40 +74,6 @@ def extract_alliteration(text: list[str]) -> list[dict]:
     return alliterations
 
 
-if __name__ == "__main__":
-    # Test the functions with doctest
-    import doctest
-
-    doctest.testmod()
-
-    # Parse user arguments
-    import argparse
-
-    parser = argparse.ArgumentParser()
-    parser.add_argument("textfile", help="Filepath to the text to analyze.")
-    parser.add_argument("--split_stanzas", action="store_true", help="Split the text into stanzas.")
-    parser.add_argument(
-        "-o",
-        "--outputfile",
-        type=Path,
-        help="File path to store results in. Defaults to the same file path and name as the input file, with the additional suffix `_alliteration.json`.",
-    )
-    args = parser.parse_args()
-
-    # Analyze the text
-    filepath = Path(args.textfile)
-    text = filepath.read_text()
-
-    if not args.outputfile:
-        args.outputfile = Path(filepath.parent / f"{filepath.stem}_alliteration.json")
-    annotate(
-        extract_alliteration,
-        text,
-        stanzaic=args.split_stanzas,
-        outputfile=args.outputfile,
-    )
-
-
 # New helper function to group indices considering stop words
 def group_alliterating_indices(indices: list, all_words_in_line: list, stop_words: list):
     """
@@ -150,15 +116,20 @@ def group_alliterating_indices(indices: list, all_words_in_line: list, stop_word
     return result_groups
 
 
-def find_line_alliterations(text: str | list, allowed_intervening_words: list | None = None):
-    """Find alliterations on a line."""
+def find_line_alliterations(text: str, allowed_intervening_words: list) -> list:  # noqa: C901
+    """Find alliterating words on a line.
+
+    Args:
+        text: A line of text with multiple tokens
+        allowed_intervening_words: words that can occur between two alliterating words
+            without breaking the alliteration effect. Defaults to "og", "i", and "er".
+    Returns:
+        list of lists of words that are alliterating
+    """
     if allowed_intervening_words is None:
         allowed_intervening_words = ["og", "i", "er"]
 
-    if isinstance(text, list):
-        words = text
-    elif isinstance(text, str):
-        words = utils.normalize(text)
+    words = normalize(text)
 
     # Stores {initial_letter: [indices_of_words_starting_with_this_letter]}
     seen = {}
@@ -191,7 +162,7 @@ def find_line_alliterations(text: str | list, allowed_intervening_words: list | 
                     # group_alliterating_indices already ensures len(group_indices) >= 2
                     alliteration_annotations.append([words[p] for p in group_indices])
 
-    return alliteration_annotations if alliteration_annotations else None
+    return alliteration_annotations
 
 
 def is_vowel(symbol: str) -> bool:
@@ -213,3 +184,37 @@ def fetch_alliteration_symbol(words: list):
         for group in words:
             symbol += group[0][0]
     return symbol if symbol else None
+
+
+if __name__ == "__main__":
+    # Test the functions with doctest
+    import doctest
+
+    doctest.testmod()
+
+    # Parse user arguments
+    import argparse
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument("textfile", help="Filepath to the text to analyze.")
+    parser.add_argument("--split_stanzas", action="store_true", help="Split the text into stanzas.")
+    parser.add_argument(
+        "-o",
+        "--outputfile",
+        type=Path,
+        help="File path to store results in. Defaults to the same file path and name as the input file, with the additional suffix `_alliteration.json`.",
+    )
+    args = parser.parse_args()
+
+    # Analyze the text
+    filepath = Path(args.textfile)
+    text = filepath.read_text()
+
+    if not args.outputfile:
+        args.outputfile = Path(filepath.parent / f"{filepath.stem}_alliteration.json")
+    annotate(
+        extract_alliteration,
+        text,
+        stanzaic=args.split_stanzas,
+        outputfile=args.outputfile,
+    )
