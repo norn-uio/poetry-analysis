@@ -201,7 +201,7 @@ def is_vowel(symbol: str) -> bool:
     return symbol.casefold() in vowels
 
 
-# Hent ut antall ord for den lengste rekken med alliterasjoner per verselinje
+# Extract the number of words for the longest sequence of alliterations per verse line
 def count_alliterations(annotations):
     if annotations is None:
         return
