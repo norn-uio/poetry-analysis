@@ -106,3 +106,115 @@ if __name__ == "__main__":
         stanzaic=args.split_stanzas,
         outputfile=args.outputfile,
     )
+
+
+from poetry_analysis import alliteration, utils
+
+
+# New helper function to group indices considering stop words
+def group_alliterating_indices(indices: list, all_words_in_line: list, stop_words: list):
+    """
+    Groups indices of words that alliterate, allowing specified stop_words in between.
+    """
+    if not indices:
+        return []
+
+    result_groups = []
+    current_group_indices = [indices[0]]
+
+    for i in range(1, len(indices)):
+        prev_allit_idx = current_group_indices[-1]
+        current_potential_idx = indices[i]
+
+        can_extend_group = True
+        # Check words between prev_allit_idx and current_potential_idx
+        if current_potential_idx > prev_allit_idx + 1:
+            for intervening_idx in range(prev_allit_idx + 1, current_potential_idx):
+                if (
+                    intervening_idx >= len(all_words_in_line)
+                    or not all_words_in_line[intervening_idx]
+                    or all_words_in_line[intervening_idx].lower() not in stop_words
+                ):
+                    can_extend_group = False
+                    break
+
+        if can_extend_group:
+            current_group_indices.append(current_potential_idx)
+        else:
+            # Store group if it has at least 2 alliterating words
+            if len(current_group_indices) >= 2:
+                result_groups.append(list(current_group_indices))  # Store a copy
+            current_group_indices = [current_potential_idx]
+
+    # Add the last formed group if it's valid
+    if len(current_group_indices) >= 2:
+        result_groups.append(list(current_group_indices))
+
+    return result_groups
+
+
+def find_line_alliterations(text: str | list, allowed_intervening_words: list | None = None):
+    """Find alliterations on a line."""
+    if allowed_intervening_words is None:
+        allowed_intervening_words = ["og", "i", "er"]
+
+    if isinstance(text, list):
+        words = text
+    elif isinstance(text, str):
+        words = utils.normalize(text)
+    elif text is None:
+        words = list()
+
+    # Stores {initial_letter: [indices_of_words_starting_with_this_letter]}
+    seen = {}
+    for j, word_token in enumerate(words):
+        if not word_token:  # Handle potential empty strings from tokenizer
+            continue
+        # Ensure word_token is not empty before accessing word_token[0]
+        if not word_token[0].isalpha():
+            continue
+        initial_letter = word_token[0].lower()
+
+        if initial_letter in seen:
+            seen[initial_letter].append(j)
+        else:
+            seen[initial_letter] = [j]
+
+    alliteration_annotations = []
+    # This part of the logic seems to run only once if the original condition was met.
+    # Assuming the goal is to find all alliterations in the line:
+    # Check if any letter appears more than once
+    if any(len(idx_list) > 1 for idx_list in seen.values()):
+        for symbol, positions in seen.items():
+            if is_vowel(symbol):  # Only extract consonant alliterations
+                continue
+            if len(positions) > 1:  # Need at least two words starting with this letter
+                # Group indices considering allowed intervening words
+                alliterating_groups = group_alliterating_indices(positions, words, allowed_intervening_words)
+
+                for group_indices in alliterating_groups:
+                    # group_alliterating_indices already ensures len(group_indices) >= 2
+                    alliteration_annotations.append([words[p] for p in group_indices])
+
+    return alliteration_annotations if alliteration_annotations else None
+
+
+def is_vowel(symbol: str) -> bool:
+    vowels = "aeiouyøæå"
+    return symbol.casefold() in vowels
+
+
+# Hent ut antall ord for den lengste rekken med alliterasjoner per verselinje
+def count_alliterations(annotations):
+    if annotations is None:
+        return
+    counter = [len(allit) for allit in annotations]
+    return max(counter)
+
+
+def fetch_alliteration_symbol(words: list):
+    symbol = ""
+    if words is not None:
+        for group in words:
+            symbol += group[0][0]
+    return symbol if symbol else None
