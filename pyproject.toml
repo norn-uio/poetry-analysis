@@ -37,7 +37,7 @@ dev = [
     "ruff",
     "mypy",
     "ipykernel",
-    "pre-commit"
+    "pre-commit",
 ]
 
 [build-system]
