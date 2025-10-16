@@ -178,9 +178,9 @@ def find_line_alliterations(text: str | list, allowed_intervening_words: list | 
             seen[initial_letter] = [j]
 
     alliteration_annotations = []
-    # This part of the logic seems to run only once if the original condition was met.
-    # Assuming the goal is to find all alliterations in the line:
-    # Check if any letter appears more than once
+    # The following logic identifies all groups of words in the line that start with the same consonant,
+    # treating them as alliterations if the initial letter appears more than once and grouping them
+    # while allowing certain intervening words.
     if any(len(idx_list) > 1 for idx_list in seen.values()):
         for symbol, positions in seen.items():
             if is_vowel(symbol):  # Only extract consonant alliterations
