@@ -25,6 +25,15 @@ It was developed alongside [NORN Poems](https://github.com/norn-uio/norn-poems),
 
 ## Installation
 
+This library requires python >= 3.11. Create and activate a virtual environment before installing, e.g. with [`uv`](https://docs.astral.sh/uv/):
+
 ```shell
+# Create environment with uv
+uv venv --python 3.11
+
+# Activate environment
+source .venv/bin/activate
+
+# Install poetry_analysis
 pip install poetry-analysis
 ```

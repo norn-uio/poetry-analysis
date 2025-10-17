@@ -10,7 +10,6 @@ We will continue with implementing a grading system for how effective the figure
 
 from collections import Counter, defaultdict
 from collections.abc import Generator
-from pathlib import Path
 
 from poetry_analysis import utils
 
@@ -205,20 +204,3 @@ if __name__ == "__main__":
     import doctest
 
     doctest.testmod()
-
-    # Parse user arguments
-    import argparse
-
-    parser = argparse.ArgumentParser()
-    parser.add_argument("textfile", help="Filepath to the text to analyze.")
-    parser.add_argument("--split_stanzas", action="store_true", help="Split the text into stanzas.")
-    args = parser.parse_args()
-
-    # Analyze the text
-    filepath = Path(args.textfile)
-    text = filepath.read_text()
-    annotations = extract_poem_anaphora(text)
-
-    output_file = Path(filepath.parent / f"{filepath.stem}_anaphora.json")
-    utils.save_annotations(annotations, output_file)
-    print(f"Anaphora saved to file: {output_file}")

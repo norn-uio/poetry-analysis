@@ -2,9 +2,7 @@
 of word-initial consonants or consonant clusters.
 """
 
-from pathlib import Path
-
-from poetry_analysis.utils import annotate
+from poetry_analysis.utils import normalize
 
 
 def count_alliteration(text: str) -> dict:
@@ -74,35 +72,127 @@ def extract_alliteration(text: list[str]) -> list[dict]:
     return alliterations
 
 
+# New helper function to group indices considering stop words
+def group_alliterating_indices(
+    indices: list[int], all_words_in_line: list[str], stop_words: list[str]
+) -> list[list[int]]:
+    """
+    Groups indices of words that alliterate, allowing specified ``stop_words`` in between.
+
+    Args:
+        indices: Indides of alliterating words in the line.
+        all_words_in_line: All words in the line.
+        stop_words: Words allowed to intervene between alliterating words.
+
+    Returns:
+        list of groups, each group is a list of indices of alliterating words,
+            where allowed stop words may intervene between them.
+    """
+    if not indices:
+        return []
+
+    result_groups = []
+    current_group_indices = [indices[0]]
+
+    for i in range(1, len(indices)):
+        prev_allit_idx = current_group_indices[-1]
+        current_potential_idx = indices[i]
+
+        can_extend_group = True
+        # Check words between prev_allit_idx and current_potential_idx
+        if current_potential_idx > prev_allit_idx + 1:
+            for intervening_idx in range(prev_allit_idx + 1, current_potential_idx):
+                if (
+                    intervening_idx >= len(all_words_in_line)
+                    or not all_words_in_line[intervening_idx]
+                    or all_words_in_line[intervening_idx].lower() not in stop_words
+                ):
+                    can_extend_group = False
+                    break
+
+        if can_extend_group:
+            current_group_indices.append(current_potential_idx)
+        else:
+            # Store group if it has at least 2 alliterating words
+            if len(current_group_indices) >= 2:
+                result_groups.append(list(current_group_indices))  # Store a copy
+            current_group_indices = [current_potential_idx]
+
+    # Add the last formed group if it's valid
+    if len(current_group_indices) >= 2:
+        result_groups.append(list(current_group_indices))
+
+    return result_groups
+
+
+def find_line_alliterations(text: str, allowed_intervening_words: list | None = None) -> list:  # noqa: C901
+    """Find alliterating words on a line.
+
+    Args:
+        text: A line of text with multiple tokens
+        allowed_intervening_words: words that can occur between two alliterating words
+            without breaking the alliteration effect. Defaults to "og", "i", and "er".
+    Returns:
+        list of lists of words that are alliterating
+    """
+    if allowed_intervening_words is None:
+        allowed_intervening_words = ["og", "i", "er"]
+
+    words = normalize(text)
+
+    # Stores {initial_letter: [indices_of_words_starting_with_this_letter]}
+    seen = {}
+    for j, word_token in enumerate(words):
+        if not word_token:  # Handle potential empty strings from tokenizer
+            continue
+        # Ensure word_token is not empty before accessing word_token[0]
+        if not word_token[0].isalpha():
+            continue
+        initial_letter = word_token[0].lower()
+
+        if initial_letter in seen:
+            seen[initial_letter].append(j)
+        else:
+            seen[initial_letter] = [j]
+
+    alliteration_annotations = []
+    # The following logic identifies all groups of words in the line that start with the same consonant,
+    # treating them as alliterations if the initial letter appears more than once and grouping them
+    # while allowing certain intervening words.
+    if any(len(idx_list) > 1 for idx_list in seen.values()):
+        for symbol, positions in seen.items():
+            if is_vowel(symbol):  # Only extract consonant alliterations
+                continue
+            if len(positions) > 1:  # Need at least two words starting with this letter
+                # Group indices considering allowed intervening words
+                alliterating_groups = group_alliterating_indices(positions, words, allowed_intervening_words)
+
+                for group_indices in alliterating_groups:
+                    # group_alliterating_indices already ensures len(group_indices) >= 2
+                    alliteration_annotations.append([words[p] for p in group_indices])
+
+    return alliteration_annotations
+
+
+def is_vowel(symbol: str) -> bool:
+    vowels = "aeiouyøæå"
+    return symbol.casefold() in vowels
+
+
+def count_alliterations(annotations: list[list[str]]) -> int:
+    """Calculate the largest number of alliterating words for sequences of alliterations."""
+    counter = [len(allit) for allit in annotations]
+    return max(counter)
+
+
+def fetch_alliteration_symbols(annotations: list[list[str]]) -> list:
+    """Gather the first letter of a word from each alliterating word group in a list of annotations."""
+    symbols = [group[0][0] for group in annotations]
+    return symbols
+
+
 if __name__ == "__main__":
     # Test the functions with doctest
     import doctest
 
     doctest.testmod()
-
-    # Parse user arguments
-    import argparse
-
-    parser = argparse.ArgumentParser()
-    parser.add_argument("textfile", help="Filepath to the text to analyze.")
-    parser.add_argument("--split_stanzas", action="store_true", help="Split the text into stanzas.")
-    parser.add_argument(
-        "-o",
-        "--outputfile",
-        type=Path,
-        help="File path to store results in. Defaults to the same file path and name as the input file, with the additional suffix `_alliteration.json`.",
-    )
-    args = parser.parse_args()
-
-    # Analyze the text
-    filepath = Path(args.textfile)
-    text = filepath.read_text()
-
-    if not args.outputfile:
-        args.outputfile = Path(filepath.parent / f"{filepath.stem}_alliteration.json")
-    annotate(
-        extract_alliteration,
-        text,
-        stanzaic=args.split_stanzas,
-        outputfile=args.outputfile,
-    )

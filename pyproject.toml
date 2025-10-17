@@ -26,6 +26,9 @@ docs = [
     "mkdocstrings>=0.30.1",
     "mkdocstrings-python>=1.18.2",
     "pymdown-extensions>=10.16.1",
+    "nbconvert>=7.16.6",
+    "mkdocs-jupyter>=0.25.1",
+    "jupytext",
 ]
 
 [dependency-groups]
@@ -35,7 +38,6 @@ dev = [
     "mypy",
     "ipykernel",
     "pre-commit",
-    "jupytext"
 ]
 
 [build-system]

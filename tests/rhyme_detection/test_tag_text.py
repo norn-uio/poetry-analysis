@@ -1,5 +1,3 @@
-import pytest
-
 from poetry_analysis.rhyme_detection import tag_text
 
 

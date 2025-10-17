@@ -41,15 +41,13 @@ def test_alliteration_returns_initial_consonant_counts():
 
 
 def test_extract_alliteration_skips_punctuation():
-    text = (
-        "her har hun høstet hvaler\n"
-        "eller er en eller annen linje\n"
-        "... her.. var ... ellipse...\n"
-        "- her - er - bindestrek-\n"
-        "? hva med? spørsmålstegn ?\n"
-    ).splitlines()
+    example = """her har hun høstet hvaler
+    eller er en eller annen linje
+    ... her.. var ... ellipse...
+    - her - er - bindestrek-
+    ? hva med? spørsmålstegn ?""".splitlines()
 
-    result = extract_alliteration(text)
+    result = extract_alliteration(example)
     assert len(result) == 2
     assert result[0]["symbol"] == "h"
     assert result[1]["symbol"] == "e"
