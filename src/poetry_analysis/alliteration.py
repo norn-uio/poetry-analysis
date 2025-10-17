@@ -2,9 +2,7 @@
 of word-initial consonants or consonant clusters.
 """
 
-from pathlib import Path
-
-from poetry_analysis.utils import annotate, normalize
+from poetry_analysis.utils import normalize
 
 
 def count_alliteration(text: str) -> dict:
@@ -75,9 +73,20 @@ def extract_alliteration(text: list[str]) -> list[dict]:
 
 
 # New helper function to group indices considering stop words
-def group_alliterating_indices(indices: list, all_words_in_line: list, stop_words: list):
+def group_alliterating_indices(
+    indices: list[int], all_words_in_line: list[str], stop_words: list[str]
+) -> list[list[int]]:
     """
-    Groups indices of words that alliterate, allowing specified stop_words in between.
+    Groups indices of words that alliterate, allowing specified ``stop_words`` in between.
+
+    Args:
+        indices: Indides of alliterating words in the line.
+        all_words_in_line: All words in the line.
+        stop_words: Words allowed to intervene between alliterating words.
+
+    Returns:
+        list of groups, each group is a list of indices of alliterating words,
+            where allowed stop words may intervene between them.
     """
     if not indices:
         return []
@@ -170,20 +179,16 @@ def is_vowel(symbol: str) -> bool:
     return symbol.casefold() in vowels
 
 
-# Extract the number of words for the longest sequence of alliterations per verse line
-def count_alliterations(annotations):
-    if annotations is None:
-        return
+def count_alliterations(annotations: list[list[str]]) -> int:
+    """Calculate the largest number of alliterating words for sequences of alliterations."""
     counter = [len(allit) for allit in annotations]
     return max(counter)
 
 
-def fetch_alliteration_symbol(words: list):
-    symbol = ""
-    if words is not None:
-        for group in words:
-            symbol += group[0][0]
-    return symbol if symbol else None
+def fetch_alliteration_symbols(annotations: list[list[str]]) -> list:
+    """Gather the first letter of a word from each alliterating word group in a list of annotations."""
+    symbols = [group[0][0] for group in annotations]
+    return symbols
 
 
 if __name__ == "__main__":
@@ -191,30 +196,3 @@ if __name__ == "__main__":
     import doctest
 
     doctest.testmod()
-
-    # Parse user arguments
-    import argparse
-
-    parser = argparse.ArgumentParser()
-    parser.add_argument("textfile", help="Filepath to the text to analyze.")
-    parser.add_argument("--split_stanzas", action="store_true", help="Split the text into stanzas.")
-    parser.add_argument(
-        "-o",
-        "--outputfile",
-        type=Path,
-        help="File path to store results in. Defaults to the same file path and name as the input file, with the additional suffix `_alliteration.json`.",
-    )
-    args = parser.parse_args()
-
-    # Analyze the text
-    filepath = Path(args.textfile)
-    text = filepath.read_text()
-
-    if not args.outputfile:
-        args.outputfile = Path(filepath.parent / f"{filepath.stem}_alliteration.json")
-    annotate(
-        extract_alliteration,
-        text,
-        stanzaic=args.split_stanzas,
-        outputfile=args.outputfile,
-    )
