@@ -4,6 +4,7 @@ dynamic = ["version"]
 description = "Tool to parse and annotate Norwegian poetry."
 authors = [
     {name = "Ingerid Dale", email = "ingerid.dale@nb.no"},
+    {name= "Ranveig Kvinnsland", email = "ranveig.kvinnsland@ibsen.uio.no"}
 ]
 dependencies = [
     "nb-tokenizer",
