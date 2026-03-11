@@ -3,6 +3,7 @@ import re
 import string
 from collections.abc import Callable, Generator
 from pathlib import Path
+from typing import Literal
 
 from convert_pa import nofabet_to_ipa, nofabet_to_syllables
 from nb_tokenizer import tokenize
@@ -69,11 +70,18 @@ def strip_redundant_whitespace(text: str) -> str:
     return re.sub(r"\s+", " ", text).strip()
 
 
-def normalize(text: str, split_tokens: bool = True) -> list[str] | str:
+def normalize_tokens(text: str) -> list[str]:
     """Lowercase, remove punctuation and tokenize a string of text."""
     lowercase = text.strip().casefold()
     alphanumeric_only = strip_punctuation(lowercase)
-    words = tokenize(alphanumeric_only) if split_tokens else alphanumeric_only
+    words = tokenize(alphanumeric_only)
+    return words
+
+
+def normalize_string(text: str) -> str:
+    """Lowercase, remove punctuation in a string of text."""
+    lowercase = text.strip().casefold()
+    words = strip_punctuation(lowercase)
     return words
 
 
@@ -314,6 +322,50 @@ def group_consecutive_numbers(nums: list[int]) -> list[list[int]]:
 
     result.append(current_group)
     return result
+
+
+def shared_initial_substring(string1: str, string2: str) -> str:
+    """Find the shared substring at the beginning of two strings."""
+    min_length = min(len(string1), len(string2))
+
+    for i in range(0, min_length):
+        if string1[i] != string2[i]:
+            initial_substring = string1[:i] if i > 1 else ""
+            return initial_substring
+    return string1[:min_length] if min_length > 0 else ""
+
+
+def shared_final_substring(string1: str, string2: str) -> str:
+    """Find the shared substring at the end of two strings."""
+    min_length = min(len(string1), len(string2))
+
+    for i in range(1, min_length + 1):
+        if string1[-i] != string2[-i]:
+            final_substring = string1[-i + 1 :] if i > 1 else ""
+            return final_substring
+    return string1[-min_length:] if min_length > 0 else ""
+
+
+def extract_repeated_substrings(text_sequence: list[str], overlap_position: Literal["initial", "final"]) -> dict:
+    """Iterate over a list of strings in `text_sequence` and extract overlapping segments in successive strings."""
+    annotations = {}
+    if not text_sequence:
+        return annotations
+    if overlap_position == "initial":
+        shared_substring = shared_initial_substring
+    elif overlap_position == "final":
+        shared_substring = shared_final_substring
+    else:
+        print("Invalid overlap_position. Must be 'initial' or 'final'.")
+        raise ValueError()
+    previous_text = normalize_string(text_sequence[0])
+    for idx in range(1, len(text_sequence)):
+        current = normalize_string(text_sequence[idx])
+        overlap = strip_redundant_whitespace(shared_substring(previous_text, current))
+        if overlap:
+            annotations[idx] = {"previous_text": previous_text, "current_text": current, "overlap": overlap}
+        previous_text = current
+    return annotations
 
 
 if __name__ == "__main__":

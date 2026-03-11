@@ -77,3 +77,46 @@ def test_extract_epiphora_ignores_whitespace_only_overlap():
 
     # then: whitespace-only overlap should not be treated as epiphora
     assert result == {}
+
+
+def test_extract_epiphora_full_stanza_final_lines():
+    input_texts = [
+        """Så gjør vi så når vi vasker vårt tøy,
+        vasker vårt tøy,
+        vasker vårt tøy,
+        tidlig en mandags morgen""",
+        """Så gjør vi så når vi skyller vårt tøy,
+        skyller vårt tøy,
+        skyller vårt tøy,
+        tidlig en tirsdags morgen""",
+        """Så gjør vi så når vi henger opp vårt tøy,
+        henger opp vårt tøy,
+        henger opp vårt tøy,
+        tidlig en onsdags morgen""",
+    ]
+    result = extract_epiphora(input_texts)
+    assert "dags morgen" in result[1]["overlap"]
+    assert "dags morgen" in result[2]["overlap"]
+
+
+def test_extract_epiphora_full_text_only_catches_successive_overlaps():
+    input_texts = [
+        "Så gjør vi så når vi vasker vårt tøy,",
+        "vasker vårt tøy, ",
+        "vasker vårt tøy,",
+        "tidlig en mandags morgen",
+        "Så gjør vi så når vi skyller vårt tøy",
+        "skyller vårt tøy",
+        "skyller vårt tøy",
+        "tidlig en tirsdags morgen",
+        "Så gjør vi så når vi henger opp vårt tøy",
+        "henger opp vårt tøy",
+        "henger opp vårt tøy",
+        "tidlig en onsdags morgen",
+    ]
+    result = extract_epiphora(input_texts)
+    overlaps = [item["overlap"] for k, item in result.items()]
+    assert overlaps, "Expected at least one epiphora overlap to be detected"
+    assert result[1]["overlap"] == result[2]["overlap"] == "vasker vårt tøy"
+    assert result[5]["overlap"] == result[6]["overlap"] == "skyller vårt tøy"
+    assert result[9]["overlap"] == result[10]["overlap"] == "henger opp vårt tøy"

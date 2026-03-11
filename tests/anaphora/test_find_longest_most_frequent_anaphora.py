@@ -66,7 +66,7 @@ def test_find_longest_repeating_sequence_returns_None_with_empty_counter():
     # When
     actual_phrase, actual_count = find_longest_most_frequent_anaphora(phrases)
     # Then
-    assert actual_phrase is None
+    assert actual_phrase == ""
     assert actual_count == 0
 
 

@@ -3,7 +3,6 @@ import pytest
 from poetry_analysis.anaphora import extract_poem_anaphora
 
 
-@pytest.mark.skip("This behavious is not implemented yet")
 def test_extract_poem_anaphora_merges_counts_across_stanzas():
     """Check that the longest repeating line initial word sequences are extracted.
     The count should be the number of lines the sequence is repeated in the stanza.
@@ -12,7 +11,7 @@ def test_extract_poem_anaphora_merges_counts_across_stanzas():
     expected = {
         "stanza_id": [0, 1],
         "line_id": [0, 1, 2, 3, 4],
-        "phrase": "Hei",
+        "phrase": "hei",
         "count": 5,
     }
 
@@ -23,7 +22,8 @@ def test_extract_poem_anaphora_merges_counts_across_stanzas():
     assert all(r["stanza_id"] == e for r, e in zip(result, expected["stanza_id"], strict=False))
     actual_lineids = [r["line_id"] for r in result]
     assert all(actual_id in expected["line_id"] for ids in actual_lineids for actual_id in ids), actual_lineids
-    assert all(r["phrase"] == expected["phrase"] for r in result)
+    for r in result:
+        assert r["phrase"] == expected["phrase"]
     assert sum(r["count"] for r in result) == expected["count"]
 
 

@@ -56,7 +56,7 @@ def test_syllabify_returns_list_of_syllables(indata, expected):
     assert len(result) == expected
 
 
-@pytest.mark.skip("Not fully implemented yet")
+@pytest.mark.skip("Not implemented yet")
 def test_split_orthographic_text_into_syllables():
     """Test that orthographic text gets split into syllables"""
     # given

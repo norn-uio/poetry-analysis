@@ -3,7 +3,8 @@ of word-initial consonants or consonant clusters.
 """
 
 from typing import Literal
-from poetry_analysis.utils import normalize
+
+from poetry_analysis.utils import normalize_tokens
 
 
 def count_alliteration(text: str) -> dict:
@@ -172,7 +173,7 @@ def find_line_alliterations(
     """
     filler_words = ["og", "i", "er"] if allowed_intervening_words is None else allowed_intervening_words
 
-    words = normalize(text)
+    words = normalize_tokens(text)
 
     # Stores {initial_letter: [indices_of_words_starting_with_this_letter]}
     seen = group_words_by_initial_letter(words, store_indices=True)

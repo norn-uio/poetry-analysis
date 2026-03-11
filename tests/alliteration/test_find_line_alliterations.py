@@ -28,12 +28,8 @@ def test_find_all_letters(poem_with_vowel_alliteration):
 
 
 def test_find_all_letters_with_invalid_letter_type(poem_with_vowel_alliteration):
-    result_invalid = find_line_alliterations(
-        poem_with_vowel_alliteration, letter_type="invalid_type"
-    )
-    result_both = find_line_alliterations(
-        poem_with_vowel_alliteration, letter_type="both"
-    )
+    result_invalid = find_line_alliterations(poem_with_vowel_alliteration, letter_type="invalid_type")
+    result_both = find_line_alliterations(poem_with_vowel_alliteration, letter_type="both")
 
     assert result_invalid == result_both
 

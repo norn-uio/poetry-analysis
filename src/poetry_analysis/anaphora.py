@@ -2,6 +2,7 @@
 in a verse, or across consecutive verses in a stanza.
 """
 
+import warnings
 from collections import Counter, defaultdict
 from collections.abc import Generator
 
@@ -13,9 +14,7 @@ from poetry_analysis import utils
 def count_initial_phrases(text: str) -> Counter:
     """Count the number of times string-initial phrases of different lengths occur in a string."""
     phrase_counts = Counter()
-
-    lowercase = text.strip().lower()
-    normalized_text = utils.strip_punctuation(lowercase)
+    normalized_text = utils.normalize_string(text)
     words = utils.tokenize(normalized_text)
     n_words = len(words)
 
@@ -38,11 +37,14 @@ def find_longest_most_frequent_anaphora(phrases: Counter) -> tuple:
         longest_count = phrases[longest_phrase]
 
         return longest_phrase, longest_count
-    return (None, 0)
+    return ("", 0)
 
 
-def extract_line_anaphora(text: str) -> list:
-    """Extract line initial word sequences that are repeated at least twice on the same line."""
+def extract_line_anaphora_old(text: str) -> list:
+    """Extract line initial word sequences that are repeated at least twice on the same line.
+
+    Deprecated.
+    """
     anaphora = []
     lines = text.strip().splitlines()
     for i, line in enumerate(lines):
@@ -77,6 +79,8 @@ def filter_anaphora(stanza_anaphora: dict) -> Generator:
 def extract_stanza_anaphora(stanza: list[str], n_words: int = 1) -> dict:
     """Gather indeces for all lines that a line-initial word repeats across successively.
 
+    DEPRECATED: This function is deprecated and should not be used in new code. It is only kept for reference.
+
     Args:
         n_words: Number of words to expect in the anaphora, must be 1 or higher.
             If higher, a single word that is repeated more often than a phrase of
@@ -84,7 +88,7 @@ def extract_stanza_anaphora(stanza: list[str], n_words: int = 1) -> dict:
     """
     stanza_anaphora = {}
     empty_list = []
-    lines = [utils.normalize(line) if line else empty_list for line in stanza]
+    lines = [utils.normalize_tokens(line) if line else empty_list for line in stanza]
     for line_index, words in enumerate(lines):
         if not words:
             continue
@@ -140,8 +144,11 @@ def detect_repeating_lines(text: str) -> list:
     return [(indeces, line) for line, indeces in repeating_lines.items()]
 
 
-def extract_anaphora(text: str) -> dict:
+def extract_anaphora_old(text: str) -> dict:
     """Extract line-initial word sequences that are repeated at least twice.
+
+    Warning:
+        This function is deprecated and should not be used in new code. It is only kept for reference.
 
     Examples:
         >>> import json
@@ -155,7 +162,7 @@ def extract_anaphora(text: str) -> dict:
         ...
         ... En regndraabe!
         ... '''
-        >>> result = extract_anaphora(text)
+        >>> result = extract_anaphora_old(text)
         >>> print(json.dumps(result, indent=4))
         {
             "1-grams": {
@@ -175,6 +182,9 @@ def extract_anaphora(text: str) -> dict:
             }
         }
     """
+    warnings.warn(
+        "extract_anaphora_old is deprecated and will be removed in a future version.", DeprecationWarning, stacklevel=2
+    )
     lines = text.strip().lower().splitlines()
     ngram_counts = defaultdict(lambda: defaultdict(int))
 
@@ -210,7 +220,7 @@ def construct_anaphora_df(df: pd.DataFrame, anaphora_length: int = 1) -> pd.Data
             if all(is_successive(indices)):
                 annotation = {
                     "poem_id": poem_id,
-                    "stanza_id": int(stanza_id),
+                    "stanza_id": int(stanza_id),  # type: ignore PGH003
                     "line_id": indices,
                     "phrase": phrase,
                     "count": len(indices),
@@ -226,6 +236,18 @@ def construct_anaphora_df(df: pd.DataFrame, anaphora_length: int = 1) -> pd.Data
 
     anaphora_df = pd.concat(dfs).reset_index(drop=True)
     return anaphora_df
+
+
+def extract_anaphora(text_sequence: list[str]) -> dict:
+    """Extract overlapping substrings in the beginning of each text in the `text_sequence`."""
+    return utils.extract_repeated_substrings(text_sequence, overlap_position="initial")
+
+
+def extract_line_anaphora(text: str) -> dict:
+    """Extract initial word sequences that are repeated at least twice in the same text string."""
+    initial_phrases = count_initial_phrases(text)
+    phrase, count = find_longest_most_frequent_anaphora(initial_phrases)
+    return {"phrase": phrase, "count": count} if count > 1 and phrase else {}
 
 
 if __name__ == "__main__":

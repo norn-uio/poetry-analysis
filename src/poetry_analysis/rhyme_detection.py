@@ -236,7 +236,7 @@ def tag_rhyming_verses(verses: list, orthographic: bool = False) -> list:
             continue
 
         if orthographic:
-            tokens = utils.normalize(verseline)
+            tokens = utils.normalize_tokens(verseline)
             last_word = find_last_word(tokens)
             if not last_word:
                 logging.debug("No tokens found in %s", verseline)
