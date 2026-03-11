@@ -9,7 +9,7 @@ from convert_pa import nofabet_to_ipa, nofabet_to_syllables
 from nb_tokenizer import tokenize
 
 PUNCTUATION_MARKS = str(
-    string.punctuation + "‒.,!?£$€%«»’”⁷⁶⁰—–––-"
+    string.punctuation + "‒.,!?£$€%«»’”“⁷⁶⁰—–––-"
 )  # Note! The long dashes look identical, but are different unicode characters
 
 VALID_NUCLEI = [
