@@ -11,22 +11,6 @@ import pandas as pd
 from poetry_analysis import utils
 
 
-def count_initial_phrases(text: str) -> Counter:
-    """Count the number of times string-initial phrases of different lengths occur in a string."""
-    phrase_counts = Counter()
-    normalized_text = utils.normalize_string(text)
-    words = utils.tokenize(normalized_text)
-    n_words = len(words)
-
-    for n in range(1, n_words + 1):
-        if len(words) >= n:
-            phrase = " ".join(words[:n])
-            count = normalized_text.count(phrase)
-            if count > 0:
-                phrase_counts[phrase] += count
-    return phrase_counts
-
-
 def extract_line_anaphora_old(text: str) -> list:
     """Extract line initial word sequences that are repeated at least twice on the same line.
 
@@ -35,7 +19,7 @@ def extract_line_anaphora_old(text: str) -> list:
     anaphora = []
     lines = text.strip().splitlines()
     for i, line in enumerate(lines):
-        line_initial_phrases = count_initial_phrases(line)
+        line_initial_phrases = utils.count_phrases(line, position="initial")
         phrase, count = utils.find_longest_most_frequent_phrase(line_initial_phrases)
         if count > 1:
             annotation = {"line_id": i, "phrase": phrase, "count": count}
@@ -232,7 +216,7 @@ def extract_anaphora(text_sequence: list[str]) -> dict:
 
 def extract_line_anaphora(text: str) -> dict:
     """Extract initial word sequences that are repeated at least twice in the same text string."""
-    initial_phrases = count_initial_phrases(text)
+    initial_phrases = utils.count_phrases(text, position="initial")
     phrase, count = utils.find_longest_most_frequent_phrase(initial_phrases)
     return {"phrase": phrase, "count": count} if count > 1 and phrase else {}
 
