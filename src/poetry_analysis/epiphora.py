@@ -9,7 +9,7 @@ from poetry_analysis import utils
 
 def extract_epiphora(text_sequence: list[str]) -> dict:
     """Extract overlapping substrings in the end of each text in the `text_sequence`."""
-    return utils.extract_repeated_substrings(text_sequence, overlap_position="final")
+    return utils.extract_repeated_token_sequences(text_sequence, overlap_position="final")
 
 
 def extract_line_epiphora(text: str) -> dict:

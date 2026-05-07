@@ -72,17 +72,17 @@ def strip_redundant_whitespace(text: str) -> str:
 
 def normalize_tokens(text: str) -> list[str]:
     """Lowercase, remove punctuation and tokenize a string of text."""
-    lowercase = text.strip().casefold()
-    alphanumeric_only = strip_punctuation(lowercase)
+    alphanumeric_only = normalize_string(text)
     words = tokenize(alphanumeric_only)
     return words
 
 
 def normalize_string(text: str) -> str:
-    """Lowercase, remove punctuation in a string of text."""
+    """Lowercase, remove punctuation, and redundant whitespace in a string of text."""
     lowercase = text.strip().casefold()
-    words = strip_punctuation(lowercase)
-    return words
+    single_space = strip_redundant_whitespace(lowercase)
+    only_text = strip_punctuation(single_space)
+    return only_text
 
 
 def strip_punctuation(string: str) -> str:
@@ -324,18 +324,18 @@ def group_consecutive_numbers(nums: list[int]) -> list[list[int]]:
     return result
 
 
-def shared_initial_substring(string1: str, string2: str) -> str:
+def shared_initial_substring(string1: str | list, string2: str | list) -> str | list:
     """Find the shared substring at the beginning of two strings."""
     min_length = min(len(string1), len(string2))
 
     for i in range(0, min_length):
         if string1[i] != string2[i]:
-            initial_substring = string1[:i] if i > 1 else ""
+            initial_substring = string1[:i] if i >= 1 else ""
             return initial_substring
     return string1[:min_length] if min_length > 0 else ""
 
 
-def shared_final_substring(string1: str, string2: str) -> str:
+def shared_final_substring(string1: str | list, string2: str | list) -> str | list:
     """Find the shared substring at the end of two strings."""
     min_length = min(len(string1), len(string2))
 
@@ -346,8 +346,8 @@ def shared_final_substring(string1: str, string2: str) -> str:
     return string1[-min_length:] if min_length > 0 else ""
 
 
-def extract_repeated_substrings(text_sequence: list[str], overlap_position: Literal["initial", "final"]) -> dict:
-    """Iterate over a list of strings in `text_sequence` and extract overlapping segments in successive strings."""
+def extract_repeated_token_sequences(text_sequence: list[str], overlap_position: Literal["initial", "final"]) -> dict:
+    """Iterate over a list of strings in `text_sequence` and extract identical token sequences in successive strings."""
     annotations = {}
     if not text_sequence:
         return annotations
@@ -361,7 +361,7 @@ def extract_repeated_substrings(text_sequence: list[str], overlap_position: Lite
     previous_text = normalize_string(text_sequence[0])
     for idx in range(1, len(text_sequence)):
         current = normalize_string(text_sequence[idx])
-        overlap = strip_redundant_whitespace(shared_substring(previous_text, current))
+        overlap = " ".join(shared_substring(tokenize(previous_text), tokenize(current)))
         if overlap:
             annotations[idx] = {"previous_text": previous_text, "current_text": current, "overlap": overlap}
         previous_text = current

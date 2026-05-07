@@ -211,7 +211,7 @@ def construct_anaphora_df(df: pd.DataFrame, anaphora_length: int = 1) -> pd.Data
 
 def extract_anaphora(text_sequence: list[str]) -> dict:
     """Extract overlapping substrings in the beginning of each text in the `text_sequence`."""
-    return utils.extract_repeated_substrings(text_sequence, overlap_position="initial")
+    return utils.extract_repeated_token_sequences(text_sequence, overlap_position="initial")
 
 
 def extract_line_anaphora(text: str) -> dict:
