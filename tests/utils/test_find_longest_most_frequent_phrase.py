@@ -1,6 +1,6 @@
 from collections import Counter
 
-from poetry_analysis.anaphora import find_longest_most_frequent_anaphora
+from poetry_analysis.utils import find_longest_most_frequent_phrase
 
 
 def test_find_most_repeating_sequence():
@@ -10,7 +10,7 @@ def test_find_most_repeating_sequence():
     expected_count = 3
 
     # When
-    actual_phrase, actual_count = find_longest_most_frequent_anaphora(phrases)
+    actual_phrase, actual_count = find_longest_most_frequent_phrase(phrases)
 
     # Then
     assert actual_phrase == expected_phrase
@@ -24,7 +24,7 @@ def test_find_longest_repeating_sequence():
     expected_count = 2
 
     # When
-    actual_phrase, actual_count = find_longest_most_frequent_anaphora(phrases)
+    actual_phrase, actual_count = find_longest_most_frequent_phrase(phrases)
 
     # Then
     assert actual_phrase == expected_phrase
@@ -38,7 +38,7 @@ def test_find_longest_most_repeating_sequence():
     expected_count = 3
 
     # When
-    actual_phrase, actual_count = find_longest_most_frequent_anaphora(phrases)
+    actual_phrase, actual_count = find_longest_most_frequent_phrase(phrases)
 
     # Then
     assert actual_phrase == expected_phrase
@@ -52,7 +52,7 @@ def test_ignores_longer_sequence_with_lower_count():
     expected_count = 3
 
     # When
-    actual_phrase, actual_count = find_longest_most_frequent_anaphora(phrases)
+    actual_phrase, actual_count = find_longest_most_frequent_phrase(phrases)
 
     # Then
     assert actual_phrase == expected_phrase
@@ -64,7 +64,7 @@ def test_find_longest_repeating_sequence_returns_None_with_empty_counter():
     phrases = Counter()
 
     # When
-    actual_phrase, actual_count = find_longest_most_frequent_anaphora(phrases)
+    actual_phrase, actual_count = find_longest_most_frequent_phrase(phrases)
     # Then
     assert actual_phrase == ""
     assert actual_count == 0
@@ -77,7 +77,7 @@ def test_find_longest_most_frequent_anaphora_returns_most_frequent_count_instead
     expected_count = 5
 
     # When
-    actual_phrase, actual_count = find_longest_most_frequent_anaphora(phrases)
+    actual_phrase, actual_count = find_longest_most_frequent_phrase(phrases)
 
     # Then
     assert actual_phrase == expected_phrase

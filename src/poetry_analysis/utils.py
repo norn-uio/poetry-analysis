@@ -3,7 +3,7 @@ import re
 import string
 from collections.abc import Callable, Generator
 from pathlib import Path
-from typing import Literal
+from typing import Counter, Literal, Optional
 
 from convert_pa import nofabet_to_ipa, nofabet_to_syllables
 from nb_tokenizer import tokenize
@@ -366,6 +366,39 @@ def extract_repeated_substrings(text_sequence: list[str], overlap_position: Lite
             annotations[idx] = {"previous_text": previous_text, "current_text": current, "overlap": overlap}
         previous_text = current
     return annotations
+
+
+def find_longest_most_frequent_phrase(phrases: Counter) -> tuple:
+    """Find the longest and most repeated word sequence in a counter."""
+    if phrases:
+        _, highest_count = phrases.most_common()[0]
+        top_phrases = [phrase for phrase, _ in phrases.most_common() if phrases[phrase] == highest_count]
+
+        longest_phrase = max(top_phrases, key=len)
+        longest_count = phrases[longest_phrase]
+
+        return longest_phrase, longest_count
+    return ("", 0)
+
+
+def count_phrases(text: str, position: Literal["initial", "final"]) -> Counter:
+    """Count the number of times string-initial phrases of different lengths occur in a string."""
+    phrase_counts = Counter()
+    normalized_text = normalize_string(text)
+    words = tokenize(normalized_text)
+    n_words = len(words)
+
+    for n in range(1, n_words + 1):
+        if len(words) >= n:
+            match position:
+                case "initial":
+                    phrase = " ".join(words[:n])
+                case "final":
+                    phrase = " ".join(words[-n:])
+            count = normalized_text.count(phrase)
+            if count > 0:
+                phrase_counts[phrase] += count
+    return phrase_counts
 
 
 if __name__ == "__main__":
