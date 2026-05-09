@@ -392,10 +392,12 @@ def count_phrases(text: str, position: Literal["initial", "final"]) -> Counter:
         if len(words) >= n:
             match position:
                 case "initial":
-                    phrase = " ".join(words[:n])
+                    phrase_words = words[:n]
                 case "final":
-                    phrase = " ".join(words[-n:])
-            count = normalized_text.count(phrase)
+                    phrase_words = words[-n:]
+            phrase = " ".join(phrase_words)
+            count = Counter(words)[phrase] if len(phrase_words) == 1 else normalized_text.count(phrase)
+
             if count > 0:
                 phrase_counts[phrase] += count
     return phrase_counts
