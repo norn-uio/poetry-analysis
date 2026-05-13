@@ -171,7 +171,9 @@ def find_line_alliterations(
     Returns:
         list of lists of words that are alliterating
     """
-    filler_words = ["og", "i", "er"] if allowed_intervening_words is None else allowed_intervening_words
+    filler_words = (
+        ["og", "i", "er", "men", "som", "for"] if allowed_intervening_words is None else allowed_intervening_words
+    )
 
     words = normalize_tokens(text)
 
@@ -201,6 +203,8 @@ def find_line_alliterations(
 
 def is_vowel(symbol: str) -> bool:
     vowels = "aeiouyøæå"
+    if len(symbol) > 1:
+        return all(is_vowel(character) for character in symbol)
     return symbol.casefold() in vowels
 
 

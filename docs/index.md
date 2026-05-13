@@ -1,12 +1,12 @@
-# poetry-analysis
+# poetry_analysis
 
 [![Python Version from PEP 621 TOML](https://img.shields.io/python/required-version-toml?tomlFilePath=https%3A%2F%2Fraw.githubusercontent.com%2Fnorn-uio%2Fpoetry-analysis%2Frefs%2Fheads%2Fmain%2Fpyproject.toml)](https://www.python.org/downloads/)
-[![PyPI - Version](https://img.shields.io/pypi/v/poetry-analysis)](https://pypi.org/project/poetry-analysis/)
-[![License](https://img.shields.io/pypi/l/poetry-analysis)](https://creativecommons.org/licenses/by/4.0/deed.en)
-[![Github Action tests](https://github.com/norn-uio/poetry-analysis/actions/workflows/check.yml/badge.svg?branch=main&event=push)](https://github.com/norn-uio/poetry-analysis/actions/workflows/check.yml)
+[![PyPI - Version](https://img.shields.io/pypi/v/poetry_analysis)](https://pypi.org/project/poetry-analysis/)
+[![License](https://img.shields.io/pypi/l/poetry_analysis)](https://creativecommons.org/licenses/by/4.0/deed.en)
+[![Github Action tests](https://github.com/norn-uio/poetry_analysis/actions/workflows/check.yml/badge.svg?branch=main&event=push)](https://github.com/norn-uio/poetry_analysis/actions/workflows/check.yml)
 
-- **GitHub repository**: <https://github.com/norn-uio/poetry-analysis/>
-- **Documentation**: <https://norn-uio.github.io/poetry-analysis/>
+- **GitHub repository**: <https://github.com/norn-uio/poetry_analysis/>
+- **Documentation**: <https://norn-uio.github.io/poetry_analysis/>
 
 Rule-based tool to extract repetition patterns and other lyric features from poetry, or other text data where the newline is a meaningful segment boundary.
 
@@ -31,7 +31,7 @@ uv venv --python 3.11
 source .venv/bin/activate
 
 # Install poetry_analysis
-pip install poetry-analysis
+pip install poetry_analysis
 ```
 
 ## Contact

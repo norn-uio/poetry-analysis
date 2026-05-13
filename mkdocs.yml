@@ -1,10 +1,10 @@
 site_name: poetry_analysis
-repo_url: https://github.com/norn-uio/poetry-analysis.git
-site_url: https://norn-uio.github.io/poetry-analysis
+repo_url: https://github.com/norn-uio/poetry_analysis.git
+site_url: https://norn-uio.github.io/poetry_analysis
 site_description: Tool to parse and annotate Norwegian poetry.
 site_author: Ingerid Dale
 edit_uri: edit/main/docs/
-repo_name: norn-uio/poetry-analysis
+repo_name: norn-uio/poetry_analysis
 copyright: Maintained by <a href="https://www.nb.no/dh-lab/">DH-laben</a> at the National Library of Norway.
 
 nav:
@@ -13,10 +13,11 @@ nav:
   - API reference:
     - Alliteration: api_alliteration.md
     - Anaphora: api_anaphora.md
+    - Epiphora: api_epiphora.md
     - End rhymes: api_end_rhymes.md
     - Lyric subject: api_lyrical_subject.md
     - Utility functions: api_utils.md
-  - 'Issue Tracker': 'https://github.com/norn-uio/poetry-analysis/issues/'
+  - 'Issue Tracker': 'https://github.com/norn-uio/poetry_analysis/issues/'
 plugins:
   - search
   - mkdocs-jupyter
@@ -29,6 +30,7 @@ plugins:
             docstring_style: google
             show_root_heading: true
             show_source: true
+
 
 theme:
   name: material
@@ -55,9 +57,9 @@ theme:
 extra:
   social:
     - icon: fontawesome/brands/github
-      link: https://github.com/norn-uio/poetry-analysis
+      link: https://github.com/norn-uio/poetry_analysis
     - icon: fontawesome/brands/python
-      link: https://pypi.org/project/poetry-analysis
+      link: https://pypi.org/project/poetry_analysis
 
 markdown_extensions:
   - toc:
