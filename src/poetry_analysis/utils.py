@@ -1,9 +1,10 @@
 import json
 import re
 import string
+from collections import Counter
 from collections.abc import Callable, Generator
 from pathlib import Path
-from typing import Counter, Literal, Optional
+from typing import Literal
 
 from convert_pa import nofabet_to_ipa, nofabet_to_syllables
 from nb_tokenizer import tokenize

@@ -2,7 +2,6 @@
 of successive clauses in a line, or of successive lines in a stanza.
 """
 
-from typing import Counter
 
 from poetry_analysis import utils
 

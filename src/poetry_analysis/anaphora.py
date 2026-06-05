@@ -3,7 +3,7 @@ in a verse, or across consecutive verses in a stanza.
 """
 
 import warnings
-from collections import Counter, defaultdict
+from collections import defaultdict
 from collections.abc import Generator
 
 import pandas as pd
