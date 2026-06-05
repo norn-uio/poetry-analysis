@@ -95,8 +95,8 @@ def test_extract_epiphora_full_stanza_final_lines():
         tidlig en onsdags morgen""",
     ]
     result = extract_epiphora(input_texts)
-    assert "dags morgen" in result[1]["overlap"]
-    assert "dags morgen" in result[2]["overlap"]
+    assert "morgen" in result[1]["overlap"]
+    assert "morgen" in result[2]["overlap"]
 
 
 def test_extract_epiphora_full_text_only_catches_successive_overlaps():

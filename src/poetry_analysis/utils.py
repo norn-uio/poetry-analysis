@@ -1,6 +1,7 @@
 import json
 import re
 import string
+from collections import Counter
 from collections.abc import Callable, Generator
 from pathlib import Path
 from typing import Literal
@@ -9,7 +10,7 @@ from convert_pa import nofabet_to_ipa, nofabet_to_syllables
 from nb_tokenizer import tokenize
 
 PUNCTUATION_MARKS = str(
-    string.punctuation + "‒.,!?£$€%«»’”“⁷⁶⁰—–––-"
+    string.punctuation + "‒.,!?£$€%«»’”“⁷⁶⁰—–––-…"
 )  # Note! The long dashes look identical, but are different unicode characters
 
 VALID_NUCLEI = [
@@ -72,17 +73,17 @@ def strip_redundant_whitespace(text: str) -> str:
 
 def normalize_tokens(text: str) -> list[str]:
     """Lowercase, remove punctuation and tokenize a string of text."""
-    lowercase = text.strip().casefold()
-    alphanumeric_only = strip_punctuation(lowercase)
+    alphanumeric_only = normalize_string(text)
     words = tokenize(alphanumeric_only)
     return words
 
 
 def normalize_string(text: str) -> str:
-    """Lowercase, remove punctuation in a string of text."""
+    """Lowercase, remove punctuation, and redundant whitespace in a string of text."""
     lowercase = text.strip().casefold()
-    words = strip_punctuation(lowercase)
-    return words
+    single_space = strip_redundant_whitespace(lowercase)
+    only_text = strip_punctuation(single_space)
+    return only_text
 
 
 def strip_punctuation(string: str) -> str:
@@ -324,18 +325,18 @@ def group_consecutive_numbers(nums: list[int]) -> list[list[int]]:
     return result
 
 
-def shared_initial_substring(string1: str, string2: str) -> str:
+def shared_initial_substring(string1: str | list, string2: str | list) -> str | list:
     """Find the shared substring at the beginning of two strings."""
     min_length = min(len(string1), len(string2))
 
     for i in range(0, min_length):
         if string1[i] != string2[i]:
-            initial_substring = string1[:i] if i > 1 else ""
+            initial_substring = string1[:i] if i >= 1 else ""
             return initial_substring
     return string1[:min_length] if min_length > 0 else ""
 
 
-def shared_final_substring(string1: str, string2: str) -> str:
+def shared_final_substring(string1: str | list, string2: str | list) -> str | list:
     """Find the shared substring at the end of two strings."""
     min_length = min(len(string1), len(string2))
 
@@ -346,8 +347,8 @@ def shared_final_substring(string1: str, string2: str) -> str:
     return string1[-min_length:] if min_length > 0 else ""
 
 
-def extract_repeated_substrings(text_sequence: list[str], overlap_position: Literal["initial", "final"]) -> dict:
-    """Iterate over a list of strings in `text_sequence` and extract overlapping segments in successive strings."""
+def extract_repeated_token_sequences(text_sequence: list[str], overlap_position: Literal["initial", "final"]) -> dict:
+    """Iterate over a list of strings in `text_sequence` and extract identical token sequences in successive strings."""
     annotations = {}
     if not text_sequence:
         return annotations
@@ -361,11 +362,46 @@ def extract_repeated_substrings(text_sequence: list[str], overlap_position: Lite
     previous_text = normalize_string(text_sequence[0])
     for idx in range(1, len(text_sequence)):
         current = normalize_string(text_sequence[idx])
-        overlap = strip_redundant_whitespace(shared_substring(previous_text, current))
+        overlap = " ".join(shared_substring(tokenize(previous_text), tokenize(current)))
         if overlap:
             annotations[idx] = {"previous_text": previous_text, "current_text": current, "overlap": overlap}
         previous_text = current
     return annotations
+
+
+def find_longest_most_frequent_phrase(phrases: Counter) -> tuple:
+    """Find the longest and most repeated word sequence in a counter."""
+    if phrases:
+        _, highest_count = phrases.most_common()[0]
+        top_phrases = [phrase for phrase, _ in phrases.most_common() if phrases[phrase] == highest_count]
+
+        longest_phrase = max(top_phrases, key=len)
+        longest_count = phrases[longest_phrase]
+
+        return longest_phrase, longest_count
+    return ("", 0)
+
+
+def count_phrases(text: str, position: Literal["initial", "final"]) -> Counter:
+    """Count the number of times string-initial phrases of different lengths occur in a string."""
+    phrase_counts = Counter()
+    normalized_text = normalize_string(text)
+    words = tokenize(normalized_text)
+    n_words = len(words)
+
+    for n in range(1, n_words + 1):
+        if len(words) >= n:
+            match position:
+                case "initial":
+                    phrase_words = words[:n]
+                case "final":
+                    phrase_words = words[-n:]
+            phrase = " ".join(phrase_words)
+            count = Counter(words)[phrase] if len(phrase_words) == 1 else normalized_text.count(phrase)
+
+            if count > 0:
+                phrase_counts[phrase] += count
+    return phrase_counts
 
 
 if __name__ == "__main__":

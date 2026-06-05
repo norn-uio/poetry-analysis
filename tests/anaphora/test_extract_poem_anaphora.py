@@ -1,4 +1,3 @@
-import pytest
 
 from poetry_analysis.anaphora import extract_poem_anaphora
 

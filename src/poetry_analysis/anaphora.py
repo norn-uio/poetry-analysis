@@ -3,41 +3,12 @@ in a verse, or across consecutive verses in a stanza.
 """
 
 import warnings
-from collections import Counter, defaultdict
+from collections import defaultdict
 from collections.abc import Generator
 
 import pandas as pd
 
 from poetry_analysis import utils
-
-
-def count_initial_phrases(text: str) -> Counter:
-    """Count the number of times string-initial phrases of different lengths occur in a string."""
-    phrase_counts = Counter()
-    normalized_text = utils.normalize_string(text)
-    words = utils.tokenize(normalized_text)
-    n_words = len(words)
-
-    for n in range(1, n_words + 1):
-        if len(words) >= n:
-            phrase = " ".join(words[:n])
-            count = normalized_text.count(phrase)
-            if count > 0:
-                phrase_counts[phrase] += count
-    return phrase_counts
-
-
-def find_longest_most_frequent_anaphora(phrases: Counter) -> tuple:
-    """Find the longest and most repeated word sequence in a counter."""
-    if phrases:
-        _, highest_count = phrases.most_common()[0]
-        top_phrases = [phrase for phrase, _ in phrases.most_common() if phrases[phrase] == highest_count]
-
-        longest_phrase = max(top_phrases, key=len)
-        longest_count = phrases[longest_phrase]
-
-        return longest_phrase, longest_count
-    return ("", 0)
 
 
 def extract_line_anaphora_old(text: str) -> list:
@@ -48,8 +19,8 @@ def extract_line_anaphora_old(text: str) -> list:
     anaphora = []
     lines = text.strip().splitlines()
     for i, line in enumerate(lines):
-        line_initial_phrases = count_initial_phrases(line)
-        phrase, count = find_longest_most_frequent_anaphora(line_initial_phrases)
+        line_initial_phrases = utils.count_phrases(line, position="initial")
+        phrase, count = utils.find_longest_most_frequent_phrase(line_initial_phrases)
         if count > 1:
             annotation = {"line_id": i, "phrase": phrase, "count": count}
             anaphora.append(annotation)
@@ -240,13 +211,13 @@ def construct_anaphora_df(df: pd.DataFrame, anaphora_length: int = 1) -> pd.Data
 
 def extract_anaphora(text_sequence: list[str]) -> dict:
     """Extract overlapping substrings in the beginning of each text in the `text_sequence`."""
-    return utils.extract_repeated_substrings(text_sequence, overlap_position="initial")
+    return utils.extract_repeated_token_sequences(text_sequence, overlap_position="initial")
 
 
 def extract_line_anaphora(text: str) -> dict:
     """Extract initial word sequences that are repeated at least twice in the same text string."""
-    initial_phrases = count_initial_phrases(text)
-    phrase, count = find_longest_most_frequent_anaphora(initial_phrases)
+    initial_phrases = utils.count_phrases(text, position="initial")
+    phrase, count = utils.find_longest_most_frequent_phrase(initial_phrases)
     return {"phrase": phrase, "count": count} if count > 1 and phrase else {}
 
 
